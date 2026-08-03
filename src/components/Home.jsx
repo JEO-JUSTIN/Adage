@@ -187,7 +187,7 @@ export default function Home() {
           ADAGE'26 · GCE Erode · Department of Civil Engineering
         </p>
         <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-[0.2em] sm:tracking-[0.25em] font-medium">
-          Crafted by Madhan A &amp; Chinnasami M
+          Created by Suganth Laxman
         </p>
       </div>
     </div>
