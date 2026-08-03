@@ -265,21 +265,21 @@ export default function Register() {
   const isUtrValid = form.transactionId.length === 12;
 
   return (
-    <div className="py-24 bg-[#0C0C0C] min-h-screen">
+    <div className="py-16 sm:py-24 bg-[#0C0C0C] min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Step Indicator */}
         {step < 4 && (
-          <div className="mb-12 flex items-center justify-between">
+          <div className="mb-8 sm:mb-12 flex items-center justify-between animate-fade-in">
             {[1, 2, 3].map((num) => (
               <React.Fragment key={num}>
-                <div className={`flex items-center justify-center w-12 h-12 rounded border-2 transition-all duration-500 ${
+                <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded border-2 transition-all duration-500 text-sm sm:text-base ${
                   step >= num ? "border-gold bg-gold text-black font-bold" : "border-white/10 text-gray-400"
                 }`}>
-                  {step > num ? <Check size={20} /> : num}
+                  {step > num ? <Check size={18} /> : num}
                 </div>
                 {num < 3 && (
-                  <div className={`flex-grow h-1 mx-4 rounded transition-all duration-500 ${
+                  <div className={`flex-grow h-0.5 sm:h-1 mx-2 sm:mx-4 rounded transition-all duration-500 ${
                     step > num ? "bg-gold" : "bg-white/10"
                   }`} />
                 )}
@@ -292,25 +292,25 @@ export default function Register() {
           
           {/* Step 1: Event Selection */}
           {step === 1 && (
-            <div className="p-8 md:p-12 space-y-8 animate-in slide-in-from-right-10 duration-500">
+            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
               <div className="text-center">
-                <h3 className="text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-widest">
+                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
                   Event Selection
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-400 text-xs sm:text-sm">
                   Technical: ₹{techBaseFee} | Non-Technical: ₹{nonTechBaseFee}
                 </p>
                 {hasTechSelected && (
-                  <div className="mt-4 inline-flex items-center gap-2 bg-gold/10 border border-gold/20 px-4 py-1 rounded">
+                  <div className="mt-3 sm:mt-4 inline-flex items-center gap-2 bg-gold/10 border border-gold/20 px-3 sm:px-4 py-1 rounded">
                     <Check size={14} className="text-gold" />
-                    <span className="text-[10px] font-black text-gold uppercase tracking-widest">
-                      Bundle Offer: 1 Free Non-Tech Event
+                    <span className="text-[9px] sm:text-[10px] font-black text-gold uppercase tracking-wider sm:tracking-widest">
+                      Bundle: 1 Free Non-Tech
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 {activeEvents.map(event => {
                   const isSelected = form.selectedEvents.includes(event.id);
                   const isNonTech = event.category === Pt.NON_TECHNICAL;
@@ -357,12 +357,12 @@ export default function Register() {
                 })}
               </div>
 
-              <div className="p-5 bg-black/40 rounded-2xl border border-white/5 flex flex-col gap-1">
+              <div className="p-4 sm:p-5 bg-black/40 rounded-2xl border border-white/5 flex flex-col gap-1">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">
-                    Base Rate Application:
+                  <span className="text-gray-400 font-bold uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest">
+                    Base Rate:
                   </span>
-                  <span className="text-xl font-cinzel font-bold text-gold">
+                  <span className="text-lg sm:text-xl font-cinzel font-bold text-gold">
                     ₹{baseRate} / Head
                   </span>
                 </div>
@@ -387,35 +387,35 @@ export default function Register() {
 
           {/* Step 2: Team Profiles */}
           {step === 2 && (
-            <div className="p-8 md:p-12 space-y-8 animate-in slide-in-from-right-10 duration-500">
+            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
               <div className="text-center">
-                <h3 className="text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-widest">
+                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
                   Team Profiles
                 </h3>
                 
-                <div className="flex items-center justify-center gap-3 bg-gold/5 border border-gold/10 py-2 px-4 rounded max-w-fit mx-auto">
-                  <UserGroup className="text-gold" size={16} />
-                  <span className="text-xs font-bold text-gold uppercase tracking-widest">
+                <div className="flex items-center justify-center gap-2 sm:gap-3 bg-gold/5 border border-gold/10 py-2 px-3 sm:px-4 rounded max-w-fit mx-auto">
+                  <UserGroup className="text-gold" size={14} />
+                  <span className="text-[10px] sm:text-xs font-bold text-gold uppercase tracking-wider sm:tracking-widest">
                     Capacity: {totalParticipants} / {maxTeamCapacity}
                   </span>
                 </div>
                 {hasTechSelected && (
-                  <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-2 font-bold">
+                  <p className="text-[8px] sm:text-[9px] text-gray-400 uppercase tracking-widest mt-2 font-bold">
                     Team size controlled by selected Technical events
                   </p>
                 )}
               </div>
 
               {/* Primary Participant Form */}
-              <div className="bg-black/20 p-8 rounded-3xl border border-white/5 mb-6">
-                <h4 className="text-gold text-xs font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
-                    <Smartphone size={16} />
+              <div className="bg-black/20 p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 mb-4 sm:mb-6">
+                <h4 className="text-gold text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-5 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
+                    <Smartphone size={14} />
                   </div>
                   Primary Participant
                 </h4>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
                   <div className="space-y-3">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Full Name</label>
                     <input
@@ -477,15 +477,15 @@ export default function Register() {
 
               {/* Secondary Team Members Form */}
               {maxTeamCapacity > 1 && (
-                <div className="bg-black/20 p-8 rounded-3xl border border-white/5">
-                  <h4 className="text-gold text-xs font-black uppercase tracking-[0.4em] mb-8 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
-                      <Users size={16} />
+                <div className="bg-black/20 p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5">
+                  <h4 className="text-gold text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-5 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
+                      <Users size={14} />
                     </div>
                     Team Members (+₹{baseRate} each)
                   </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     {form.teamMembers.map((member, index) => (
                       <div key={index} className="space-y-2">
                         <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
@@ -509,7 +509,7 @@ export default function Register() {
               )}
 
               {/* Summary Fee banner */}
-              <div className="p-5 bg-gold/5 border border-gold/10 rounded-2xl flex justify-between items-center">
+              <div className="p-4 sm:p-5 bg-gold/5 border border-gold/10 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
                 <div className="flex items-center gap-3">
                   <Users className="text-gold" size={20} />
                   <div>
@@ -519,15 +519,15 @@ export default function Register() {
                     </p>
                   </div>
                 </div>
-                <p className="text-2xl font-cinzel font-black text-gold">
+                <p className="text-xl sm:text-2xl font-cinzel font-black text-gold">
                   ₹{totalPayableFee}
                 </p>
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <button
                   onClick={handlePrevStep}
-                  className="flex-1 border border-white/20 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs"
+                  className="sm:flex-1 border border-white/20 text-white py-3.5 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs order-2 sm:order-1"
                 >
                   <ArrowLeft size={16} /> Back
                 </button>
@@ -537,7 +537,7 @@ export default function Register() {
                     !form.name || !form.college || !form.department || !form.email || !form.phone ||
                     !!validationErrors.email || !!validationErrors.phone
                   }
-                  className="flex-[2] bg-gold text-black py-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#B07A20] transition-all disabled:opacity-30 glow-gold"
+                  className="sm:flex-[2] bg-gold text-black py-3.5 sm:py-4 rounded-xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#B07A20] transition-all disabled:opacity-30 glow-gold order-1 sm:order-2"
                 >
                   Proceed to Payment <ArrowRight size={16} />
                 </button>
@@ -547,30 +547,30 @@ export default function Register() {
 
           {/* Step 3: Secure Payment */}
           {step === 3 && (
-            <div className="p-8 md:p-12 space-y-8 animate-in slide-in-from-right-10 duration-500">
+            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
               <div className="text-center">
-                <h3 className="text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-widest">
+                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
                   Secure Payment
                 </h3>
-                <p className="text-gray-400">
+                <p className="text-gray-400 text-sm">
                   Total Payable: <span className="text-gold font-bold">₹{totalPayableFee}</span>
                 </p>
               </div>
 
               <div className="flex flex-col items-center max-w-md mx-auto">
                 {/* QR Code Container */}
-                <div className="bg-white p-6 rounded-lg border-4 border-gold glow-gold shadow-md mb-12">
-                  <img src={upiQrCodeUrl} alt="Payment QR Code" className="w-64 h-64 object-contain" />
-                  <div className="mt-6 pt-6 border-t border-gray-100 flex flex-col items-center">
-                    <p className="text-black font-black text-xl tracking-widest">{upiId}</p>
-                    <p className="text-gray-400 text-[10px] uppercase font-black mt-2">
+                <div className="bg-white p-4 sm:p-6 rounded-lg border-4 border-gold glow-gold shadow-md mb-8 sm:mb-12">
+                  <img src={upiQrCodeUrl} alt="Payment QR Code" className="w-48 h-48 sm:w-64 sm:h-64 object-contain mx-auto" />
+                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100 flex flex-col items-center">
+                    <p className="text-black font-black text-sm sm:text-xl tracking-widest break-all text-center">{upiId}</p>
+                    <p className="text-gray-400 text-[9px] sm:text-[10px] uppercase font-black mt-2 text-center">
                       Department of Civil Engineering GCE Erode
                     </p>
                   </div>
                 </div>
 
                 {/* Important Notes */}
-                <div className="w-full bg-amber-900/10 border border-amber-900/30 rounded-2xl p-5 mb-8">
+                <div className="w-full bg-amber-900/10 border border-amber-900/30 rounded-xl sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8">
                   <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
                     <Info size={14} /> Important Notes
                   </h5>
@@ -615,28 +615,28 @@ export default function Register() {
                 </div>
               )}
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
                 <button
                   onClick={handlePrevStep}
-                  className="flex-1 border border-white/20 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs"
+                  className="sm:flex-1 border border-white/20 text-white py-3.5 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs order-2 sm:order-1"
                 >
                   <ArrowLeft size={16} /> Back
                 </button>
                 <button
                   onClick={handleRegistrationSubmit}
                   disabled={isSubmitting || !isUtrValid}
-                  className={`flex-[2] py-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-2 transition-all shadow-lg ${
+                  className={`sm:flex-[2] py-3.5 sm:py-4 rounded-xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs flex items-center justify-center gap-2 transition-all shadow-lg order-1 sm:order-2 ${
                     isUtrValid
                       ? "bg-gold text-black hover:bg-[#B07A20] glow-gold"
                       : "bg-white/5 text-gray-400 border border-white/5 cursor-not-allowed opacity-30"
                   }`}
                 >
                   {isSubmitting ? (
-                    <Loader className="animate-spin" size={20} />
+                    <Loader className="animate-spin" size={18} />
                   ) : (
-                    <ShieldCheck size={20} />
+                    <ShieldCheck size={18} />
                   )}
-                  {isSubmitting ? "Confirming..." : "Complete & Download Pass"}
+                  {isSubmitting ? "Confirming..." : "Complete & Download"}
                 </button>
               </div>
             </div>
@@ -644,15 +644,15 @@ export default function Register() {
 
           {/* Step 4: Success Pass View */}
           {step === 4 && createdRecord && (
-            <div className="p-8 md:p-12 text-center animate-in zoom-in duration-700 bg-gradient-to-b from-[#111] to-[#0A0A0A]">
-              <div className="w-20 h-20 bg-green-500/10 text-green-500 rounded flex items-center justify-center mx-auto mb-8 border border-green-500/20">
-                <Check size={40} strokeWidth={3} />
+            <div className="p-5 sm:p-8 md:p-12 text-center animate-fade-in-up bg-gradient-to-b from-[#111] to-[#0A0A0A]">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-500/10 text-green-500 rounded flex items-center justify-center mx-auto mb-5 sm:mb-8 border border-green-500/20 animate-pulse-gold">
+                <Check size={32} strokeWidth={3} />
               </div>
-              <h3 className="text-3xl md:text-5xl font-cinzel font-black text-white mb-4 tracking-widest uppercase">
+              <h3 className="text-2xl sm:text-3xl md:text-5xl font-cinzel font-black text-white mb-3 sm:mb-4 tracking-wider sm:tracking-widest uppercase">
                 REGISTRATION SUCCESS
               </h3>
-              <p className="text-sm text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
-                Payment logged for ID: <span className="text-gold font-mono">{createdRecord.transactionId}</span>. Your pass is ready!
+              <p className="text-xs sm:text-sm text-gray-400 mb-6 sm:mb-8 max-w-md mx-auto leading-relaxed">
+                Payment logged for ID: <span className="text-gold font-mono break-all">{createdRecord.transactionId}</span>. Your pass is ready!
               </p>
 
               {/* Whatsapp Communities */}
@@ -691,9 +691,9 @@ export default function Register() {
               </div>
 
               {/* Entry Pass Card (To be downloaded) */}
-              <div className="relative max-w-sm mx-auto group mb-12">
-                <div className="absolute inset-0 bg-gold/20 blur-[80px] rounded opacity-40" />
-                <div ref={passRef} className="relative bg-black border-2 border-gold/40 rounded-[3.5rem] p-10 shadow-md overflow-hidden">
+              <div className="relative max-w-xs sm:max-w-sm mx-auto group mb-8 sm:mb-12">
+                <div className="absolute inset-0 bg-gold/20 blur-[60px] sm:blur-[80px] rounded opacity-40" />
+                <div ref={passRef} className="relative bg-black border-2 border-gold/40 rounded-[2rem] sm:rounded-[3.5rem] p-6 sm:p-10 shadow-md overflow-hidden">
                   <div className="relative z-10">
                     <div className="flex justify-between items-start mb-10">
                       <div className="text-left">
@@ -730,22 +730,22 @@ export default function Register() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-5 justify-center">
+              <div className="flex flex-col gap-3 sm:gap-5 sm:flex-row justify-center px-2 sm:px-0">
                 <button
                   onClick={() => navigate("/dashboard")}
-                  className="bg-gold text-black px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-[#B07A20] transition-all glow-gold flex items-center justify-center gap-3"
+                  className="bg-gold text-black px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs hover:bg-[#B07A20] transition-all glow-gold flex items-center justify-center gap-2 sm:gap-3"
                 >
-                  Check Dashboard <ArrowRight size={20} />
+                  Check Dashboard <ArrowRight size={18} />
                 </button>
                 <button
                   onClick={handleDownloadPass}
                   disabled={isDownloading}
-                  className="bg-white/5 border border-white/10 text-white px-12 py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-white/10 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                  className="bg-white/5 border border-white/10 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs hover:bg-white/10 transition-all flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50"
                 >
                   {isDownloading ? (
-                    <Loader className="animate-spin" size={20} />
+                    <Loader className="animate-spin" size={18} />
                   ) : (
-                    <Download size={20} />
+                    <Download size={18} />
                   )}
                   Download Pass
                 </button>
