@@ -10,7 +10,7 @@ export const ut = {
   PRESENT: "Checked In"
 };
 
-export const lp = "2026-08-24T09:00:00";
+export const lp = "2026-09-02T09:00:00";
 
 export const Sr = [
   {
@@ -153,7 +153,7 @@ export const Sr = [
     image: "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&q=80&w=800",
     rules: [
       "Team size: Maximum 3 or 4 members.",
-      "Abstract should be submitted in PDF and PPT format (6-7 slides) before August 23 on adage26@gmail.com.",
+      "Abstract should be submitted in PDF and PPT format (6-7 slides) before September 1 on adage26@gmail.com.",
       "Topics must relate to Civil Engineering, smart materials, or environmental sustainability.",
       "Presentation must be 7-10 minutes followed by Q&A.",
       "College ID card is mandatory.",

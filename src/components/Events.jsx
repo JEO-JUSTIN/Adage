@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Award, X, Phone, ArrowRight, Loader, Zap } from 'lucide-react';
+import { X, Phone, ArrowRight, Loader, Zap } from 'lucide-react';
 import { Sr, Pt } from '../events';
 import { supabase } from '../supabase';
 
@@ -188,49 +188,81 @@ export default function Events() {
         {filtered.length === 0 ? (
           <p className="text-center text-gray-400 py-20 sm:py-24 font-cinzel uppercase tracking-widest text-sm">No events found.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-px sm:bg-white/[0.04]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((event, i) => (
-              <div key={event.id} className="bg-[#0C0C0C] hover:bg-[#0F0F0F] transition-colors group flex flex-col border border-white/5 hover:border-[#C8922A]/20 animate-fade-in-up" style={{ animationDelay: `${i * 80}ms` }}>
-                {/* Image */}
-                <div className="relative h-40 sm:h-44 overflow-hidden">
-                  <img
-                    src={event.image || fallback}
-                    alt={event.title}
-                    onError={e => e.target.src = fallback}
-                    className="w-full h-full object-cover opacity-40 group-hover:opacity-55 transition-opacity duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0C0C0C] via-[#0C0C0C]/30 to-transparent" />
-                  <span className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-[#C8922A] text-[#0C0C0C] text-[8px] sm:text-[9px] font-bold uppercase tracking-widest px-2 sm:px-2.5 py-1">
-                    ₹{event.fee} / Head
-                  </span>
-                </div>
+              <div
+                key={event.id}
+                className="bg-[#0A0D14] hover:bg-[#0E121A] transition-all duration-300 group flex flex-col border-2 border-white/5 hover:border-[#C8922A]/30 animate-fade-in-up relative p-1"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                {/* Engineering corner blueprint tick marks */}
+                <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t border-l border-[#C8922A]/40" />
+                <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t border-r border-[#C8922A]/40" />
+                <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b border-l border-[#C8922A]/40" />
+                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b border-r border-[#C8922A]/40" />
 
-                {/* Info */}
-                <div className="p-5 sm:p-6 flex-grow flex flex-col">
-                  <div className="flex items-center justify-between mb-2 sm:mb-3">
-                    <span className="text-[8px] sm:text-[9px] text-[#C8922A] font-bold uppercase tracking-[0.25em]">{event.category}</span>
-                    <span className="flex items-center gap-1.5 text-gray-400 text-[9px] sm:text-[10px]">
-                      <Users size={10} /> {event.maxMembers} max
+                {/* Inner layout frame */}
+                <div className="border border-white/[0.04] p-4 flex flex-col h-full bg-black/40 relative">
+                  {/* Faint blueprint draft dots background */}
+                  <div className="blueprint-draft-lines opacity-10 pointer-events-none" />
+
+                  {/* Blueprint visual box */}
+                  <div className="relative h-36 sm:h-40 overflow-hidden mb-4 border border-white/[0.05]">
+                    <img
+                      src={event.image || fallback}
+                      alt={event.title}
+                      onError={e => e.target.src = fallback}
+                      className="w-full h-full object-cover opacity-45 group-hover:opacity-60 transition-opacity duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D14] via-transparent to-transparent" />
+                    <span className="absolute top-2 right-2 bg-[#C8922A] text-[#0C0C0C] text-[8px] font-mono font-black tracking-widest px-2 py-0.5 border border-[#C8922A] select-none whitespace-nowrap">
+                      ₹{event.fee} / ENTRY
                     </span>
                   </div>
-                  <h3 className="font-cinzel font-black text-base sm:text-lg text-[#EDEBE6] uppercase tracking-wider mb-2 sm:mb-3 group-hover:text-[#C8922A] transition-colors leading-tight">
-                    {event.title}
-                  </h3>
-                  <p className="text-gray-400 text-[11px] sm:text-xs leading-relaxed mb-5 sm:mb-6 flex-grow line-clamp-3">{event.description}</p>
 
-                  <div className="grid grid-cols-2 gap-2 mt-auto">
-                    <button
-                      onClick={() => setSelected(event)}
-                      className="btn-ghost px-3 py-2.5 text-[9px] justify-center text-gray-300"
-                    >
-                      Details
-                    </button>
-                    <Link
-                      to={`/register?eventId=${event.id}`}
-                      className="btn-primary px-3 py-2.5 text-[9px] justify-center"
-                    >
-                      Register
-                    </Link>
+                  {/* Title Block Header */}
+                  <div className="flex flex-wrap gap-x-2 gap-y-0.5 justify-between items-start mb-3 pb-2 border-b border-[#C8922A]/10 font-mono text-[7px] text-gray-500 select-none">
+                    <div className="whitespace-nowrap">
+                      <p>DRG TYPE: {event.category.toUpperCase()}</p>
+                      <p>SCALE: 1:100</p>
+                    </div>
+                    <div className="text-right whitespace-nowrap">
+                      <p>STATUS: [OPEN]</p>
+                      <p>DRG NO: AD-26-E{String(i+1).padStart(2,'0')}</p>
+                    </div>
+                  </div>
+
+                  {/* Content Info */}
+                  <div className="flex-grow flex flex-col">
+                    <h3 className="font-cinzel font-black text-base text-[#EDEBE6] uppercase tracking-widest mb-1.5 group-hover:text-[#C8922A] transition-colors leading-tight">
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-400 text-[10px] leading-relaxed mb-4 line-clamp-3 font-mono">
+                      {event.description}
+                    </p>
+
+                    {/* AutoCAD details tag block */}
+                    <div className="border border-white/[0.04] bg-white/[0.02] p-2 flex justify-between items-center text-[8px] font-mono mb-4 text-gray-400 select-none">
+                      <span>TEAM MAX: {event.maxMembers}</span>
+                      <span>TIME: {event.timing || '10:00 AM'}</span>
+                      <span className="text-[#C8922A] font-bold">APPROVED</span>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="grid grid-cols-2 gap-2 mt-auto">
+                      <button
+                        onClick={() => setSelected(event)}
+                        className="btn-ghost px-2 py-2 text-[8px] tracking-widest justify-center text-gray-300 font-mono border-white/[0.08]"
+                      >
+                        SPEC SHEET
+                      </button>
+                      <Link
+                        to={`/register?eventId=${event.id}`}
+                        className="btn-primary px-2 py-2 text-[8px] tracking-widest justify-center font-mono font-bold"
+                      >
+                        REGISTER
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
