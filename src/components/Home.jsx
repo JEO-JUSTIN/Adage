@@ -409,8 +409,7 @@ export default function Home() {
       {/* CAD blueprints vector background */}
       <HeroBlueprint />
       
-      {/* CAD coordinates corner annotations */}
-      <CADCoordinates />
+
 
       {/* ── Hero ─────────────────────────────────────────── */}
       <section className="min-h-[calc(100vh-3.5rem)] flex items-center px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto py-16 sm:py-12 relative z-10 overflow-hidden">
