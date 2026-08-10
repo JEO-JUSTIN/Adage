@@ -30,7 +30,7 @@ export default function About() {
   const contactItems = [
     { icon: <MapPin size={13} />, label: 'Address', value: 'Suriyampalayam, Vasavi College PO, Erode, Tamil Nadu — 638 316' },
     { icon: <Phone size={13} />,  label: 'Contact', value: '+91 94430 39388' },
-    { icon: <Clock size={13} />,  label: 'Event',   value: 'Wednesday, 2 September 2026 · 9 AM onwards' },
+    { icon: <Clock size={13} />,  label: 'Event',   value: 'Thursday, 3 September 2026 · 9 AM onwards' },
   ];
 
   return (

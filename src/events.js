@@ -10,7 +10,7 @@ export const ut = {
   PRESENT: "Checked In"
 };
 
-export const lp = "2026-09-02T09:00:00";
+export const lp = "2026-09-03T09:00:00";
 
 export const Sr = [
   {

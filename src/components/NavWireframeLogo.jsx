@@ -2,6 +2,7 @@ import React from 'react';
 
 /**
  * NavWireframeLogo renders a clean architectural vector logo for ADAGE '26.
+ * Features golden triangular accents inside both 'A' letters.
  * - animated={false} (default for Navbar): renders static with crisp gold outlines.
  * - animated={true} (for Main Hero Title): renders with progressive stroke-drawing animation.
  */
@@ -24,7 +25,7 @@ export default function NavWireframeLogo({ className = '', animated = false }) {
           }
           @keyframes cadFillFade {
             0% { fill-opacity: 0; }
-            100% { fill-opacity: 0.25; }
+            100% { fill-opacity: 0.6; }
           }
           @keyframes cadApostropheFade {
             0% { opacity: 0; transform: scale(0.8); }
@@ -76,7 +77,15 @@ export default function NavWireframeLogo({ className = '', animated = false }) {
         <g stroke="url(#wireframe-gold-grad)" strokeWidth="2.5" strokeLinejoin="miter">
           <path d="M 165 80 L 195 10 L 225 80" className={drawClass} style={animated ? { animationDelay: '0.5s' } : {}} />
           <line x1="177" y1="52" x2="213" y2="52" strokeWidth="2" className={drawClass} style={animated ? { animationDelay: '0.65s' } : {}} />
-          <polygon points="195,52 183,80 207,80" fill="rgba(200,146,42,0.25)" strokeWidth="1" className={animated ? 'cad-path-animate cad-fill-animate' : ''} style={animated ? { animationDelay: '0.8s' } : {}} />
+          {/* Inner Golden Triangle Accent for Second A */}
+          <polygon
+            points="195,52 183,80 207,80"
+            fill="url(#wireframe-gold-grad)"
+            stroke="url(#wireframe-gold-grad)"
+            strokeWidth="1.5"
+            className={animated ? 'cad-apostrophe-animate' : ''}
+            style={animated ? { animationDelay: '0.7s' } : {}}
+          />
         </g>
 
         {/* ── Letter G ── */}

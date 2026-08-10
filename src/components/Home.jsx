@@ -470,7 +470,7 @@ export default function Home() {
             {/* Venue details */}
             <div className="space-y-1 text-center md:text-right">
               <p className="text-xs font-bold text-[#EDEBE6] uppercase tracking-wider">
-                2 September 2026
+                3 September 2026
               </p>
               <a
                 href="https://maps.app.goo.gl/dpZ1Amf1r3dFJqK29"
