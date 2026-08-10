@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { ShieldCheck, QrCode, Award, Utensils, ArrowRight } from 'lucide-react';
 import { lp } from '../events';
 import ThreeDText from './ThreeDText';
+import AdageLogo from './AdageLogo';
+import NavWireframeLogo from './NavWireframeLogo';
 
 // ─── Countdown Timer Component ──────────────────────────────────────────
 export function CountdownTimer({ targetDate, outlineOnly = false, hideText = false }) {
@@ -52,9 +54,9 @@ export function CountdownTimer({ targetDate, outlineOnly = false, hideText = fal
 // ─── Hero Blueprint Drawing ─────────────────────────────────────────────
 function HeroBlueprint() {
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-4 sm:opacity-6">
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20 sm:opacity-30">
       <svg className="w-full h-full text-[#C8922A]" viewBox="0 0 1000 600" fill="none" stroke="currentColor">
-        <g strokeWidth="0.5" strokeDasharray="6,6" opacity="0.25">
+        <g strokeWidth="0.75" strokeDasharray="4,4" opacity="0.45">
           <line x1="100" y1="0" x2="100" y2="600" />
           <line x1="200" y1="0" x2="200" y2="600" />
           <line x1="300" y1="0" x2="300" y2="600" />
@@ -189,8 +191,8 @@ function AnimatedCraneTitle() {
         </svg>
       </div>
 
-      <div className="relative z-10 w-full max-w-full sm:max-w-[540px] md:max-w-[640px] h-auto my-2">
-        <ThreeDText text="ADAGE'26" className="w-full" filled={false} />
+      <div className="relative z-10 w-full max-w-full sm:max-w-[540px] md:max-w-[640px] h-auto my-3">
+        <NavWireframeLogo className="w-full h-auto" animated={true} />
       </div>
     </div>
   );
@@ -406,13 +408,14 @@ export default function Home() {
   return (
     <div className="min-h-screen relative">
       
+      {/* Studio ambient lighting spotlight */}
+      <div className="studio-spotlight" />
+
       {/* CAD blueprints vector background */}
       <HeroBlueprint />
-      
-
 
       {/* ── Hero ─────────────────────────────────────────── */}
-      <section className="min-h-[calc(100vh-3.5rem)] flex items-center px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto py-16 sm:py-12 relative z-10 overflow-hidden">
+      <section className="min-h-[calc(100vh-4rem)] flex items-center px-4 sm:px-6 lg:px-16 max-w-7xl mx-auto py-16 sm:py-12 relative z-10 overflow-hidden">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 sm:gap-12 lg:gap-16 items-center w-full">
           
           {/* Left Column: Brand & Actions */}
@@ -469,9 +472,14 @@ export default function Home() {
               <p className="text-xs font-bold text-[#EDEBE6] uppercase tracking-wider">
                 2 September 2026
               </p>
-              <p className="text-[9px] sm:text-[10px] text-gray-400 uppercase tracking-[0.2em] font-medium">
-                GCE Erode Campus · 9:00 AM
-              </p>
+              <a
+                href="https://maps.app.goo.gl/dpZ1Amf1r3dFJqK29"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[9px] sm:text-[10px] text-gray-400 hover:text-[#C8922A] transition-colors uppercase tracking-[0.2em] font-medium inline-block"
+              >
+                GCE Erode Campus ↗ · 9:00 AM
+              </a>
             </div>
           </div>
           

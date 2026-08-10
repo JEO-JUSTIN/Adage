@@ -195,12 +195,11 @@ export default function App() {
   return (
     <Router>
       {/* 4-Phase Dynamic Scrolling Background */}
-      <div className={`blueprint-transition ${
-        scrollPhase === 'sketch' ? 'site-bg-sketch' :
-        scrollPhase === 'wireframe' ? 'site-bg-wireframe' :
-        scrollPhase === 'concrete' ? 'site-bg-concrete' :
-        'site-bg-finished'
-      }`} />
+      <div className={`blueprint-transition ${scrollPhase === 'sketch' ? 'site-bg-sketch' :
+          scrollPhase === 'wireframe' ? 'site-bg-wireframe' :
+            scrollPhase === 'concrete' ? 'site-bg-concrete' :
+              'site-bg-finished'
+        }`} />
 
       {/* Very faint concrete texture overlay (2% opacity) */}
       <div className="concrete-overlay" />
@@ -232,7 +231,7 @@ export default function App() {
 
       <div className="flex flex-col min-h-screen text-[#EDEBE6] custom-cursor-enabled">
         <Navbar />
-        
+
         <main className="flex-grow pt-14">
           <Routes>
             <Route path="/" element={<Home />} />

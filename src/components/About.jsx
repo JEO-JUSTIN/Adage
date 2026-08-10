@@ -28,7 +28,7 @@ export default function About() {
   ];
 
   const contactItems = [
-    { icon: <MapPin size={13} />, label: 'Address', value: 'Sathy Road, Perundurai, Erode — 638 052' },
+    { icon: <MapPin size={13} />, label: 'Address', value: 'Suriyampalayam, Vasavi College PO, Erode, Tamil Nadu — 638 316' },
     { icon: <Phone size={13} />,  label: 'Contact', value: '+91 94430 39388' },
     { icon: <Clock size={13} />,  label: 'Event',   value: 'Wednesday, 2 September 2026 · 9 AM onwards' },
   ];
@@ -124,20 +124,39 @@ export default function About() {
                     <div className="text-[#C8922A] mt-0.5 flex-shrink-0">{item.icon}</div>
                     <div>
                       <p className="section-label mb-1">{item.label}</p>
-                      <p className="text-xs sm:text-sm text-gray-400">{item.value}</p>
+                      {item.label === 'Address' ? (
+                        <a
+                          href="https://maps.app.goo.gl/dpZ1Amf1r3dFJqK29"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs sm:text-sm text-gray-400 hover:text-[#C8922A] transition-colors inline-flex items-center gap-1"
+                        >
+                          {item.value} ↗
+                        </a>
+                      ) : (
+                        <p className="text-xs sm:text-sm text-gray-400">{item.value}</p>
+                      )}
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="h-52 sm:h-64 lg:h-full min-h-[220px] overflow-hidden border border-white/[0.06] animate-fade-in-up anim-delay-200">
+            <div className="h-52 sm:h-64 lg:h-full min-h-[220px] overflow-hidden border border-white/[0.06] relative group animate-fade-in-up anim-delay-200">
               <iframe
                 title="GCE Erode Map"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3910.665798485202!2d77.671343715335!3d11.431257491879!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba915d3f3f5a6e1%3A0x6b803023e98c9195!2sGovernment%20College%20of%20Engineering%2C%20Erode!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3910.3702587508753!2d77.67876877508535!3d11.45524318873722!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba9680a653bb7e5%3A0xbefbe4fd0a790589!2sGovernment%20College%20of%20Engineering%2C%20Erode!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
                 width="100%" height="100%" className="border-0 grayscale opacity-50 hover:opacity-80 transition-opacity"
                 allowFullScreen loading="lazy"
               />
+              <a
+                href="https://maps.app.goo.gl/dpZ1Amf1r3dFJqK29"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="absolute inset-0 z-10 flex items-end justify-end p-3 bg-gradient-to-t from-black/80 via-transparent to-transparent text-xs text-[#C8922A] font-semibold hover:underline"
+              >
+                Open Google Maps ↗
+              </a>
             </div>
           </div>
         </div>
