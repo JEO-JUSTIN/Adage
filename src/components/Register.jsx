@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-import { Check, Info, Users, Smartphone, ShieldCheck, Download, Award, ArrowLeft, ArrowRight, Loader, Cpu, Sparkles, Layers, CreditCard, ChevronRight } from 'lucide-react';
+import { Check, Info, Users, Smartphone, ShieldCheck, Download, Award, ArrowLeft, ArrowRight, Loader, Cpu, Sparkles, Layers, CreditCard, ChevronRight, QrCode } from 'lucide-react';
 import { supabase } from '../supabase';
 import { Sr, Pt, ut } from '../events';
 
@@ -670,17 +670,25 @@ export default function Register() {
                   <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-[#C8922A]" />
 
                   <span className="text-[9px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block mb-4">
-                    SCAN TO PAY EXACT AMOUNT
+                    UPI PAYMENT DETAILS
                   </span>
 
-                  <div className="bg-white p-4 inline-block border-2 border-[#C8922A] shadow-xl mb-4">
-                    <img src={upiQrCodeUrl} alt="Payment QR Code" className="w-44 h-44 sm:w-52 sm:h-52 object-contain mx-auto" />
+                  {/* QR Code Placeholder Box */}
+                  <div className="bg-black/60 p-8 border-2 border-dashed border-[#C8922A]/40 flex flex-col items-center justify-center min-h-[200px] mb-4">
+                    <QrCode size={48} className="text-[#C8922A] mb-3 opacity-60" />
+                    <p className="text-xs font-cad font-bold text-[#EDEBE6] uppercase tracking-wider">
+                      [ QR CODE PLACEHOLDER ]
+                    </p>
+                    <p className="text-[9px] text-gray-500 font-cad mt-1">
+                      Scan via GPay / PhonePe / Paytm
+                    </p>
                   </div>
 
-                  <div className="bg-black/80 border border-white/[0.08] p-3 text-center">
-                    <p className="text-xs font-cad font-bold text-[#EDEBE6] select-all">{upiId}</p>
-                    <p className="text-[9px] text-gray-400 font-cad uppercase mt-1">
-                      Civil Dept GCE Erode
+                  <div className="bg-black/80 border border-white/[0.08] p-3 text-center space-y-1">
+                    <p className="text-[9px] text-gray-500 font-cad uppercase">UPI ID / VPA</p>
+                    <p className="text-xs font-cad font-bold text-[#C8922A] select-all">[ UPI ID PLACEHOLDER ]</p>
+                    <p className="text-[9px] text-gray-400 font-cad uppercase pt-1 border-t border-white/[0.06] mt-2">
+                      Payee: [ NAME PLACEHOLDER ]
                     </p>
                   </div>
                 </div>
