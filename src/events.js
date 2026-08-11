@@ -5,6 +5,7 @@ export const Pt = {
 
 export const ut = {
   PENDING: "Payment Pending Verification",
+  REVIEW: "Under Review",
   CONFIRMED: "Confirmed",
   REJECTED: "Rejected",
   PRESENT: "Checked In"

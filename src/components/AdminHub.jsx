@@ -787,7 +787,7 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                 </div>
                 
                 <div className="flex gap-2 w-full md:w-auto overflow-x-auto py-1">
-                  {["ALL", ut.PENDING, ut.CONFIRMED, ut.PRESENT].map(statusVal => (
+                  {["ALL", ut.PENDING, ut.REVIEW, ut.CONFIRMED, ut.PRESENT, ut.REJECTED].map(statusVal => (
                     <button
                       key={statusVal}
                       onClick={() => setFilterStatus(statusVal)}
@@ -795,7 +795,7 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                         filterStatus === statusVal ? "bg-gold/20 border-gold text-gold" : "border-white/5 text-gray-400 hover:text-white"
                       }`}
                     >
-                      {statusVal === ut.PENDING ? "PENDING" : statusVal}
+                      {statusVal === ut.PENDING ? "PENDING" : statusVal === ut.REVIEW ? "UNDER REVIEW" : statusVal}
                     </button>
                   ))}
                 </div>
@@ -828,34 +828,22 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                               ? "text-blue-400 border-blue-400/30 bg-blue-400/5"
                               : participant.status === ut.CONFIRMED
                               ? "text-green-500 border-green-500/30 bg-green-500/5"
+                              : participant.status === ut.REVIEW
+                              ? "text-amber-400 border-amber-400/30 bg-amber-400/5"
+                              : participant.status === ut.REJECTED
+                              ? "text-red-400 border-red-400/30 bg-red-400/5"
                               : "text-gold border-gold/30 bg-gold/5 animate-pulse"
                           }`}>
-                            {participant.status === ut.PRESENT ? "Checked In" : participant.status === ut.CONFIRMED ? "Confirmed" : "Pending"}
+                            {participant.status === ut.PRESENT ? "Checked In" : participant.status === ut.CONFIRMED ? "Confirmed" : participant.status === ut.REVIEW ? "Under Review" : participant.status === ut.REJECTED ? "Rejected" : "Pending"}
                           </span>
                         </td>
                         <td className="px-10 py-8 text-right">
-                          <div className="flex justify-end gap-2">
-                            {participant.status === ut.PENDING && (
-                              <button
-                                onClick={() => onUpdateStatus(participant.id, ut.CONFIRMED)}
-                                className="px-4 py-2 bg-green-500/10 text-green-500 border border-green-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-green-500 hover:text-white transition-all"
-                              >
-                                Confirm Payment
-                              </button>
-                            )}
-                            {participant.status === ut.CONFIRMED && (
-                              <button
-                                onClick={() => onUpdateStatus(participant.id, ut.PRESENT)}
-                                className="px-4 py-2 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-lg text-[9px] font-black uppercase hover:bg-blue-500 hover:text-white transition-all"
-                              >
-                                Check-In
-                              </button>
-                            )}
+                          <div className="flex justify-end">
                             <button
                               onClick={() => setSelectedId(participant.id)}
-                              className="p-2 bg-white/5 text-gray-400 hover:text-gold rounded-xl transition-all border border-white/10"
+                              className="px-5 py-2.5 bg-white/5 text-gray-300 hover:text-gold hover:bg-gold/10 hover:border-gold/30 rounded-lg transition-all border border-white/10 text-[10px] font-black uppercase tracking-wider flex items-center gap-2"
                             >
-                              <Search size={18} />
+                              <ClipboardList size={14} /> View Details
                             </button>
                           </div>
                         </td>
@@ -1158,6 +1146,58 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                           {eTitle}
                         </span>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Status Action Buttons */}
+                  <div className="bg-[#080808] p-5 rounded-xl border border-white/10 space-y-3">
+                    <label className="text-[9px] font-black uppercase tracking-[0.2em] block text-[#C8922A]">
+                      UPDATE REGISTRATION STATUS
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.CONFIRMED)}
+                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
+                          selectedParticipant.status === ut.CONFIRMED
+                            ? "bg-green-500 text-white border-green-500 shadow-md"
+                            : "bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500 hover:text-white"
+                        }`}
+                      >
+                        <CheckCircle size={14} /> Confirm Payment
+                      </button>
+
+                      <button
+                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.REVIEW)}
+                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
+                          selectedParticipant.status === ut.REVIEW
+                            ? "bg-amber-500 text-black border-amber-500 shadow-md"
+                            : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500 hover:text-black"
+                        }`}
+                      >
+                        <Clock size={14} /> Under Review
+                      </button>
+
+                      <button
+                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.REJECTED)}
+                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
+                          selectedParticipant.status === ut.REJECTED
+                            ? "bg-red-500 text-white border-red-500 shadow-md"
+                            : "bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white"
+                        }`}
+                      >
+                        <X size={14} /> Reject
+                      </button>
+
+                      <button
+                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.PRESENT)}
+                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
+                          selectedParticipant.status === ut.PRESENT
+                            ? "bg-blue-500 text-white border-blue-500 shadow-md"
+                            : "bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500 hover:text-white"
+                        }`}
+                      >
+                        <ShieldCheck size={14} /> Check-In
+                      </button>
                     </div>
                   </div>
                 </div>
