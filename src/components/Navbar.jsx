@@ -13,7 +13,6 @@ export default function Navbar() {
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
     { name: 'Check Status', path: '/verify' },
-    { name: 'Admin', path: '/admin' },
   ];
     
   return (
