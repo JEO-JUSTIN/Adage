@@ -282,7 +282,7 @@ export default function Register() {
 
   return (
     <div className="py-12 sm:py-20 min-h-screen">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8">
         
         {/* Page Title & Blueprint Tag */}
         <div className="text-center mb-10 sm:mb-14">
@@ -350,7 +350,7 @@ export default function Register() {
           
           {/* STEP 1: EVENT SELECTION */}
           {step === 1 && (
-            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in">
               <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -485,7 +485,7 @@ export default function Register() {
 
           {/* STEP 2: TEAM PROFILES */}
           {step === 2 && (
-            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in">
               <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -507,7 +507,7 @@ export default function Register() {
               </div>
 
               {/* Primary Participant Form */}
-              <div className="bg-[#080808] border border-white/[0.08] p-6 sm:p-8 space-y-6">
+              <div className="bg-[#080808] border border-white/[0.08] p-4 sm:p-8 space-y-6">
                 <div className="flex items-center gap-3 border-b border-white/[0.06] pb-4">
                   <div className="w-7 h-7 bg-[#C8922A]/20 border border-[#C8922A] flex items-center justify-center text-[#C8922A]">
                     <Smartphone size={14} />
@@ -659,7 +659,7 @@ export default function Register() {
 
           {/* STEP 3: SECURE PAYMENT & UTR INPUT */}
           {step === 3 && (
-            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in">
               <div className="border-b border-white/[0.08] pb-6">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase">MODULE 03</span>
@@ -768,7 +768,7 @@ export default function Register() {
 
           {/* STEP 4: REVIEW & FINAL VERIFICATION */}
           {step === 4 && (
-            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+            <div className="p-4 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in">
               <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -790,7 +790,7 @@ export default function Register() {
               </div>
 
               {/* Review Card Summary Container */}
-              <div className="bg-[#080808] border border-white/[0.08] p-6 sm:p-8 space-y-6 relative">
+              <div className="bg-[#080808] border border-white/[0.08] p-4 sm:p-8 space-y-6 relative">
                 <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-[#C8922A]" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-[#C8922A]" />
                 <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-[#C8922A]" />
