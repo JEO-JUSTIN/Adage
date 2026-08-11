@@ -174,6 +174,7 @@ export default function Register() {
       !form.name || !form.college || !form.department || !form.email || !form.phone ||
       validationErrors.email || validationErrors.phone
     )) return;
+    if (step === 3 && (!form.transactionId || form.transactionId.length !== 12)) return;
     setStep(step + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -228,7 +229,7 @@ export default function Register() {
 
       setCreatedRecord(payload);
       localStorage.setItem('adage_user_email', payload.email);
-      setStep(4);
+      setStep(5);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error("Submission failed:", err);
@@ -266,9 +267,6 @@ export default function Register() {
     }
   };
 
-  const upiPaymentLink = `upi://pay?pa=${upiId}&pn=ADAGE%20Symposium&am=${totalPayableFee}&cu=INR&tn=ADAGE%20Reg`;
-  const upiQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPaymentLink)}`;
-  
   const passQrCodeUrl = createdRecord
     ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&bgcolor=000&color=C8922A&data=${encodeURIComponent(JSON.stringify({ id: createdRecord.id, type: "ADAGE_ENTRY" }))}`
     : "";
@@ -278,7 +276,8 @@ export default function Register() {
   const stepLabels = [
     { num: 1, tag: "STEP 01", title: "SELECT EVENTS" },
     { num: 2, tag: "STEP 02", title: "TEAM PROFILE" },
-    { num: 3, tag: "STEP 03", title: "PAYMENT VERIFY" }
+    { num: 3, tag: "STEP 03", title: "PAYMENT INFO" },
+    { num: 4, tag: "STEP 04", title: "FINAL REVIEW" }
   ];
 
   return (
@@ -303,20 +302,20 @@ export default function Register() {
         </div>
 
         {/* Stepper Navigation Strip */}
-        {step < 4 && (
+        {step < 5 && (
           <div className="mb-10 sm:mb-14 bg-[#0A0A0A] border border-white/[0.08] p-4 sm:p-6 relative">
             <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t border-l border-[#C8922A]" />
             <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t border-r border-[#C8922A]" />
             <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b border-l border-[#C8922A]" />
             <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b border-r border-[#C8922A]" />
 
-            <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
+            <div className="grid grid-cols-4 gap-2 sm:gap-4 items-center">
               {stepLabels.map((s) => {
                 const isActive = step === s.num;
                 const isDone = step > s.num;
                 return (
                   <div key={s.num} className="flex flex-col items-center text-center relative group">
-                    <div className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center font-cad font-bold text-xs sm:text-sm transition-all duration-300 border mb-2 ${
+                    <div className={`w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center font-cad font-bold text-xs sm:text-sm transition-all duration-300 border mb-2 ${
                       isDone
                         ? "bg-[#C8922A] border-[#C8922A] text-black"
                         : isActive
@@ -325,12 +324,12 @@ export default function Register() {
                     }`}>
                       {isDone ? <Check size={18} strokeWidth={3} /> : `0${s.num}`}
                     </div>
-                    <span className={`text-[8px] sm:text-[9px] font-cad uppercase tracking-[0.2em] font-bold ${
+                    <span className={`text-[8px] sm:text-[9px] font-cad uppercase tracking-[0.15em] sm:tracking-[0.2em] font-bold ${
                       isActive || isDone ? "text-[#C8922A]" : "text-gray-500"
                     }`}>
                       {s.tag}
                     </span>
-                    <span className={`text-[9px] sm:text-[11px] font-cinzel font-bold uppercase tracking-wider hidden sm:block ${
+                    <span className={`text-[8px] sm:text-[11px] font-cinzel font-bold uppercase tracking-wider hidden sm:block ${
                       isActive || isDone ? "text-[#EDEBE6]" : "text-gray-600"
                     }`}>
                       {s.title}
@@ -658,7 +657,7 @@ export default function Register() {
             </div>
           )}
 
-          {/* STEP 3: SECURE PAYMENT */}
+          {/* STEP 3: SECURE PAYMENT & UTR INPUT */}
           {step === 3 && (
             <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
               <div className="border-b border-white/[0.08] pb-6">
@@ -668,12 +667,12 @@ export default function Register() {
                   <span className="text-[10px] text-gray-400 font-cad uppercase">TRANSACTION VERIFICATION</span>
                 </div>
                 <h2 className="font-cinzel font-black text-xl sm:text-2xl text-[#EDEBE6] uppercase">
-                  UPI Payment & Verification
+                  UPI Payment & Transaction ID
                 </h2>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                {/* QR Code Container */}
+                {/* QR Code Placeholder Container */}
                 <div className="bg-[#080808] border border-white/[0.08] p-6 text-center relative group">
                   <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-[#C8922A]" />
                   <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-[#C8922A]" />
@@ -713,7 +712,7 @@ export default function Register() {
                     <ul className="text-[11px] text-gray-400 font-cad space-y-2 list-disc pl-4 leading-relaxed">
                       <li>Pay exact total: <strong className="text-[#C8922A]">₹{totalPayableFee}</strong> using GPay, PhonePe, or Paytm.</li>
                       <li>Copy the <strong className="text-white">12-Digit Transaction Ref / UTR ID</strong> from your UPI app receipt.</li>
-                      <li>Paste the UTR number below to generate your entry pass instantly.</li>
+                      <li>Paste the UTR number below to proceed to final review.</li>
                     </ul>
                   </div>
 
@@ -746,86 +745,6 @@ export default function Register() {
                       </p>
                     )}
                   </div>
-
-                  {/* Pre-Submission Registration Verification Summary Box */}
-                  <div className="bg-[#080808] border border-[#C8922A]/40 p-5 space-y-4 relative">
-                    <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t border-l border-[#C8922A]" />
-                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t border-r border-[#C8922A]" />
-                    <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b border-l border-[#C8922A]" />
-                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b border-r border-[#C8922A]" />
-
-                    <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
-                      <div className="flex items-center gap-2">
-                        <ShieldCheck size={14} className="text-[#C8922A]" />
-                        <span className="text-[10px] font-cad font-bold text-[#C8922A] uppercase tracking-wider">
-                          VERIFY YOUR DETAILS BEFORE SUBMITTING
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => setStep(2)}
-                        className="text-[9px] font-cad text-gray-400 hover:text-[#C8922A] underline uppercase tracking-wider"
-                      >
-                        Edit Details ✎
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 text-xs font-cad">
-                      <div>
-                        <span className="text-[9px] text-gray-500 uppercase block">Leader Name</span>
-                        <strong className="text-[#EDEBE6] uppercase">{form.name || '—'}</strong>
-                      </div>
-                      <div>
-                        <span className="text-[9px] text-gray-500 uppercase block">College</span>
-                        <span className="text-gray-300">{form.college || '—'}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] text-gray-500 uppercase block">Department</span>
-                        <span className="text-gray-300">{form.department || '—'}</span>
-                      </div>
-                      <div>
-                        <span className="text-[9px] text-gray-500 uppercase block">Phone / Contact</span>
-                        <span className="text-gray-300">{form.phone || '—'}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-[9px] text-gray-500 uppercase block">Email Address</span>
-                        <span className="text-gray-300">{form.email || '—'}</span>
-                      </div>
-                      {form.teamMembers.filter(m => m.trim() !== "").length > 0 && (
-                        <div className="col-span-2 border-t border-white/[0.06] pt-2">
-                          <span className="text-[9px] text-gray-500 uppercase block">Team Members</span>
-                          <span className="text-[#C8922A]">{form.teamMembers.filter(m => m.trim() !== "").join(", ")}</span>
-                        </div>
-                      )}
-                      <div className="col-span-2 border-t border-white/[0.06] pt-2">
-                        <span className="text-[9px] text-gray-500 uppercase block">Selected Events</span>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {selectedEventsList.map(e => (
-                            <span key={e.id} className="text-[9px] bg-[#C8922A]/10 border border-[#C8922A]/30 text-[#C8922A] px-2 py-0.5 font-bold uppercase">
-                              {e.title}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="col-span-2 border-t border-white/[0.06] pt-2 flex justify-between items-center">
-                        <div>
-                          <span className="text-[9px] text-gray-500 uppercase block">Total Payable Fee</span>
-                          <strong className="text-[#C8922A] text-sm font-cinzel">₹{totalPayableFee} ({totalParticipants} Participant{totalParticipants > 1 ? 's' : ''})</strong>
-                        </div>
-                        {isUtrValid && (
-                          <div className="text-right">
-                            <span className="text-[9px] text-gray-500 uppercase block">Entered UTR ID</span>
-                            <span className="text-emerald-400 font-bold font-mono text-xs">{form.transactionId}</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-cad text-center">
-                      {error.message}
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -834,11 +753,147 @@ export default function Register() {
                   onClick={handlePrevStep}
                   className="sm:flex-1 btn-ghost justify-center py-4 text-xs tracking-widest"
                 >
-                  <ArrowLeft size={16} /> BACK TO STEP 2
+                  <ArrowLeft size={16} /> BACK
+                </button>
+                <button
+                  onClick={handleNextStep}
+                  disabled={!isUtrValid}
+                  className="sm:flex-[2] btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
+                >
+                  REVIEW & VERIFY DETAILS <ArrowRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 4: REVIEW & FINAL VERIFICATION */}
+          {step === 4 && (
+            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+              <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase">MODULE 04</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8922A]" />
+                    <span className="text-[10px] text-gray-400 font-cad uppercase">FINAL VERIFICATION & REVIEW</span>
+                  </div>
+                  <h2 className="font-cinzel font-black text-xl sm:text-2xl text-[#EDEBE6] uppercase">
+                    Review Your Registration Details
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2 bg-[#C8922A]/10 border border-[#C8922A]/30 px-3 py-1.5">
+                  <ShieldCheck size={14} className="text-[#C8922A]" />
+                  <span className="text-[10px] font-cad font-bold text-[#C8922A] uppercase tracking-wider">
+                    Ready For Submission
+                  </span>
+                </div>
+              </div>
+
+              {/* Review Card Summary Container */}
+              <div className="bg-[#080808] border border-white/[0.08] p-6 sm:p-8 space-y-6 relative">
+                <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-[#C8922A]" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-[#C8922A]" />
+                <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-[#C8922A]" />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-[#C8922A]" />
+
+                {/* Primary Participant Summary */}
+                <div className="border-b border-white/[0.06] pb-6 space-y-3">
+                  <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block">
+                    01 // PRIMARY PARTICIPANT
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-cad text-xs">
+                    <div>
+                      <span className="text-gray-500 text-[10px] block uppercase">FULL NAME</span>
+                      <span className="text-[#EDEBE6] font-bold">{form.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-[10px] block uppercase">COLLEGE</span>
+                      <span className="text-[#EDEBE6] font-bold">{form.college}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-[10px] block uppercase">DEPARTMENT</span>
+                      <span className="text-[#EDEBE6] font-bold">{form.department}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 text-[10px] block uppercase">PHONE</span>
+                      <span className="text-[#EDEBE6] font-bold">{form.phone}</span>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="text-gray-500 text-[10px] block uppercase">EMAIL ADDRESS</span>
+                      <span className="text-[#EDEBE6] font-bold">{form.email}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Team Members Summary */}
+                {form.teamMembers.filter(m => m.trim() !== "").length > 0 && (
+                  <div className="border-b border-white/[0.06] pb-6 space-y-3">
+                    <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block">
+                      02 // TEAM MEMBERS
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 font-cad text-xs">
+                      {form.teamMembers.filter(m => m.trim() !== "").map((m, idx) => (
+                        <div key={idx} className="bg-black/60 border border-white/[0.06] p-2.5 flex items-center gap-2">
+                          <span className="text-[#C8922A] font-bold text-[10px]">#{idx + 2}</span>
+                          <span className="text-gray-300 font-bold">{m}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Selected Events Summary */}
+                <div className="border-b border-white/[0.06] pb-6 space-y-3">
+                  <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block">
+                    03 // REGISTERED EVENTS
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedEventsList.map(ev => (
+                      <div key={ev.id} className="bg-[#C8922A]/10 border border-[#C8922A]/30 px-3 py-1.5 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#C8922A]" />
+                        <span className="text-xs font-cad font-bold text-[#EDEBE6]">{ev.title}</span>
+                        <span className="text-[9px] font-cad text-[#C8922A]">({ev.category})</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Payment Summary & Entered UTR */}
+                <div className="space-y-3">
+                  <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block">
+                    04 // PAYMENT & TRANSACTION VERIFICATION
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-cad text-xs bg-black/60 border border-white/[0.06] p-4">
+                    <div>
+                      <span className="text-gray-500 text-[10px] block uppercase">12-DIGIT TRANSACTION ID (UTR)</span>
+                      <strong className="text-[#C8922A] text-sm tracking-[0.2em] font-bold">{form.transactionId}</strong>
+                    </div>
+                    <div className="sm:text-right">
+                      <span className="text-gray-500 text-[10px] block uppercase">TOTAL AMOUNT PAYABLE</span>
+                      <strong className="text-[#EDEBE6] text-sm font-bold">₹{totalPayableFee}</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-cad text-center">
+                  {error.message}
+                </div>
+              )}
+
+              {/* Final Action Buttons with Back Button */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/[0.08]">
+                <button
+                  onClick={handlePrevStep}
+                  disabled={isSubmitting}
+                  className="sm:flex-1 btn-ghost justify-center py-4 text-xs tracking-widest"
+                >
+                  <ArrowLeft size={16} /> BACK TO EDIT
                 </button>
                 <button
                   onClick={handleRegistrationSubmit}
-                  disabled={isSubmitting || !isUtrValid}
+                  disabled={isSubmitting}
                   className="sm:flex-[2] btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
                 >
                   {isSubmitting ? (
@@ -846,14 +901,14 @@ export default function Register() {
                   ) : (
                     <ShieldCheck size={18} />
                   )}
-                  {isSubmitting ? "VERIFYING & GENERATING PASS..." : "CONFIRM & SUBMIT REGISTRATION"}
+                  {isSubmitting ? "CONFIRMING & SUBMITTING..." : "CONFIRM & SUBMIT REGISTRATION"}
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: REGISTRATION SUCCESS & ENTRY PASS */}
-          {step === 4 && createdRecord && (
+          {/* STEP 5: REGISTRATION SUCCESS & ENTRY PASS */}
+          {step === 5 && createdRecord && (
             <div className="p-6 sm:p-10 md:p-12 text-center animate-fade-in space-y-8">
               <div className="w-16 h-16 bg-[#C8922A]/20 border border-[#C8922A] text-[#C8922A] flex items-center justify-center mx-auto glow-gold">
                 <Check size={32} strokeWidth={3} />
