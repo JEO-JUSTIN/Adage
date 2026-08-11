@@ -747,6 +747,80 @@ export default function Register() {
                     )}
                   </div>
 
+                  {/* Pre-Submission Registration Verification Summary Box */}
+                  <div className="bg-[#080808] border border-[#C8922A]/40 p-5 space-y-4 relative">
+                    <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t border-l border-[#C8922A]" />
+                    <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t border-r border-[#C8922A]" />
+                    <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b border-l border-[#C8922A]" />
+                    <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b border-r border-[#C8922A]" />
+
+                    <div className="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={14} className="text-[#C8922A]" />
+                        <span className="text-[10px] font-cad font-bold text-[#C8922A] uppercase tracking-wider">
+                          VERIFY YOUR DETAILS BEFORE SUBMITTING
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => setStep(2)}
+                        className="text-[9px] font-cad text-gray-400 hover:text-[#C8922A] underline uppercase tracking-wider"
+                      >
+                        Edit Details ✎
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-xs font-cad">
+                      <div>
+                        <span className="text-[9px] text-gray-500 uppercase block">Leader Name</span>
+                        <strong className="text-[#EDEBE6] uppercase">{form.name || '—'}</strong>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-gray-500 uppercase block">College</span>
+                        <span className="text-gray-300">{form.college || '—'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-gray-500 uppercase block">Department</span>
+                        <span className="text-gray-300">{form.department || '—'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[9px] text-gray-500 uppercase block">Phone / Contact</span>
+                        <span className="text-gray-300">{form.phone || '—'}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-[9px] text-gray-500 uppercase block">Email Address</span>
+                        <span className="text-gray-300">{form.email || '—'}</span>
+                      </div>
+                      {form.teamMembers.filter(m => m.trim() !== "").length > 0 && (
+                        <div className="col-span-2 border-t border-white/[0.06] pt-2">
+                          <span className="text-[9px] text-gray-500 uppercase block">Team Members</span>
+                          <span className="text-[#C8922A]">{form.teamMembers.filter(m => m.trim() !== "").join(", ")}</span>
+                        </div>
+                      )}
+                      <div className="col-span-2 border-t border-white/[0.06] pt-2">
+                        <span className="text-[9px] text-gray-500 uppercase block">Selected Events</span>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {selectedEventsList.map(e => (
+                            <span key={e.id} className="text-[9px] bg-[#C8922A]/10 border border-[#C8922A]/30 text-[#C8922A] px-2 py-0.5 font-bold uppercase">
+                              {e.title}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="col-span-2 border-t border-white/[0.06] pt-2 flex justify-between items-center">
+                        <div>
+                          <span className="text-[9px] text-gray-500 uppercase block">Total Payable Fee</span>
+                          <strong className="text-[#C8922A] text-sm font-cinzel">₹{totalPayableFee} ({totalParticipants} Participant{totalParticipants > 1 ? 's' : ''})</strong>
+                        </div>
+                        {isUtrValid && (
+                          <div className="text-right">
+                            <span className="text-[9px] text-gray-500 uppercase block">Entered UTR ID</span>
+                            <span className="text-emerald-400 font-bold font-mono text-xs">{form.transactionId}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   {error && (
                     <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-cad text-center">
                       {error.message}
@@ -760,7 +834,7 @@ export default function Register() {
                   onClick={handlePrevStep}
                   className="sm:flex-1 btn-ghost justify-center py-4 text-xs tracking-widest"
                 >
-                  <ArrowLeft size={16} /> BACK
+                  <ArrowLeft size={16} /> BACK TO STEP 2
                 </button>
                 <button
                   onClick={handleRegistrationSubmit}
@@ -772,7 +846,7 @@ export default function Register() {
                   ) : (
                     <ShieldCheck size={18} />
                   )}
-                  {isSubmitting ? "VERIFYING & GENERATING PASS..." : "SUBMIT & GET ENTRY PASS"}
+                  {isSubmitting ? "VERIFYING & GENERATING PASS..." : "CONFIRM & SUBMIT REGISTRATION"}
                 </button>
               </div>
             </div>
