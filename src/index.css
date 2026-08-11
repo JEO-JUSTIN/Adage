@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
 
 /* ─── Design Tokens ─────────────────────────────── */
 :root {
@@ -24,7 +24,7 @@ html {
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Share Tech Mono', 'Inter', monospace;
   background-color: var(--bg);
   color: var(--text);
   overflow-x: hidden;
@@ -33,6 +33,7 @@ body {
 
 /* ─── Typography ─────────────────────────────────── */
 .font-cinzel { font-family: 'Cinzel', serif; }
+.font-cad    { font-family: 'Share Tech Mono', monospace; }
 
 /* ─── Accent colour aliases ──────────────────────── */
 .text-gold    { color: var(--accent); }

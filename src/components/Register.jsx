@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import html2canvas from 'html2canvas';
-import { Check, Info, Users, Smartphone, ShieldCheck, Download, Users as UserGroup, Award, ArrowLeft, ArrowRight, Loader } from 'lucide-react';
+import { Check, Info, Users, Smartphone, ShieldCheck, Download, Award, ArrowLeft, ArrowRight, Loader, Cpu, Sparkles, Layers, CreditCard, ChevronRight } from 'lucide-react';
 import { supabase } from '../supabase';
 import { Sr, Pt, ut } from '../events';
 
@@ -73,7 +73,6 @@ export default function Register() {
   const totalParticipants = 1 + validTeamCount;
   
   // Fee Calculation
-  // flat base rate (250 for tech, 150 for non-tech) * total number of participants
   const baseRate = hasTechSelected ? techBaseFee : nonTechBaseFee;
   const totalPayableFee = totalParticipants * baseRate;
 
@@ -147,9 +146,8 @@ export default function Register() {
         const hasTech = currentSelectedList.some(e => e.category === Pt.TECHNICAL);
         const hasNonTech = currentSelectedList.some(e => e.category === Pt.NON_TECHNICAL);
 
-        // Bundle offer: 1 Free Non-Tech Event if Tech is selected
         if (targetEvent.category === Pt.NON_TECHNICAL && hasTech && hasNonTech) {
-          return prev; // Lock to maximum 1 non-tech if bundle is active
+          return prev;
         }
         events.push(id);
       }
@@ -177,11 +175,13 @@ export default function Register() {
       validationErrors.email || validationErrors.phone
     )) return;
     setStep(step + 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handlePrevStep = () => {
     setError(null);
     setStep(step - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Submit to Database
@@ -193,7 +193,7 @@ export default function Register() {
     setError(null);
 
     try {
-      const generatedId = Math.random().toString(36).substr(2, 9).toUpperCase();
+      const generatedId = "ADG" + Math.random().toString(36).substring(2, 8).toUpperCase();
       const payload = {
         id: generatedId,
         name: form.name,
@@ -218,22 +218,22 @@ export default function Register() {
       setCreatedRecord(payload);
       localStorage.setItem('adage_user_email', payload.email);
       setStep(4);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       console.error("Submission failed:", err);
       setError({
-        message: err.message || "Failed to complete registration."
+        message: err.message || "Failed to complete registration. Please verify database connection."
       });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Generate and download pass image
+  // Download pass PNG image
   const handleDownloadPass = async () => {
     if (passRef.current) {
       setIsDownloading(true);
       try {
-        // Delay to allow elements to load
         await new Promise(resolve => setTimeout(resolve, 300));
         const canvas = await html2canvas(passRef.current, {
           backgroundColor: "#000000",
@@ -243,7 +243,7 @@ export default function Register() {
         });
 
         const link = document.createElement("a");
-        link.download = `ADAGE_PASS_${createdRecord?.id}.png`;
+        link.download = `ADAGE_ENTRY_PASS_${createdRecord?.id}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
       } catch (err) {
@@ -259,64 +259,134 @@ export default function Register() {
   const upiQrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiPaymentLink)}`;
   
   const passQrCodeUrl = createdRecord
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&bgcolor=000&color=FFD700&data=${encodeURIComponent(JSON.stringify({ id: createdRecord.id, type: "ADAGE_ENTRY" }))}`
+    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&bgcolor=000&color=C8922A&data=${encodeURIComponent(JSON.stringify({ id: createdRecord.id, type: "ADAGE_ENTRY" }))}`
     : "";
 
   const isUtrValid = form.transactionId.length === 12;
 
+  const stepLabels = [
+    { num: 1, tag: "STEP 01", title: "SELECT EVENTS" },
+    { num: 2, tag: "STEP 02", title: "TEAM PROFILE" },
+    { num: 3, tag: "STEP 03", title: "PAYMENT VERIFY" }
+  ];
+
   return (
-    <div className="py-16 sm:py-24 bg-[#0C0C0C] min-h-screen">
+    <div className="py-12 sm:py-20 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Step Indicator */}
+        {/* Page Title & Blueprint Tag */}
+        <div className="text-center mb-10 sm:mb-14">
+          <div className="inline-flex items-center gap-2 mb-3">
+            <span className="w-8 h-px bg-[#C8922A]" />
+            <span className="text-[10px] uppercase tracking-[0.4em] text-[#C8922A] font-cad font-bold">
+              CAD REGISTRATION PORTAL
+            </span>
+            <span className="w-8 h-px bg-[#C8922A]" />
+          </div>
+          <h1 className="font-cinzel font-black text-3xl sm:text-4xl md:text-5xl text-[#EDEBE6] uppercase tracking-wide mb-3">
+            PORTAL ACCESS & REGISTRATION
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-400 font-cad max-w-xl mx-auto">
+            Select technical challenges, configure your structural team roster, and secure entry passes for ADAGE'26.
+          </p>
+        </div>
+
+        {/* Stepper Navigation Strip */}
         {step < 4 && (
-          <div className="mb-8 sm:mb-12 flex items-center justify-between animate-fade-in">
-            {[1, 2, 3].map((num) => (
-              <React.Fragment key={num}>
-                <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded border-2 transition-all duration-500 text-sm sm:text-base ${
-                  step >= num ? "border-gold bg-gold text-black font-bold" : "border-white/10 text-gray-400"
-                }`}>
-                  {step > num ? <Check size={18} /> : num}
-                </div>
-                {num < 3 && (
-                  <div className={`flex-grow h-0.5 sm:h-1 mx-2 sm:mx-4 rounded transition-all duration-500 ${
-                    step > num ? "bg-gold" : "bg-white/10"
-                  }`} />
-                )}
-              </React.Fragment>
-            ))}
+          <div className="mb-10 sm:mb-14 bg-[#0A0A0A] border border-white/[0.08] p-4 sm:p-6 relative">
+            <div className="absolute -top-1.5 -left-1.5 w-3 h-3 border-t border-l border-[#C8922A]" />
+            <div className="absolute -top-1.5 -right-1.5 w-3 h-3 border-t border-r border-[#C8922A]" />
+            <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b border-l border-[#C8922A]" />
+            <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b border-r border-[#C8922A]" />
+
+            <div className="grid grid-cols-3 gap-2 sm:gap-4 items-center">
+              {stepLabels.map((s) => {
+                const isActive = step === s.num;
+                const isDone = step > s.num;
+                return (
+                  <div key={s.num} className="flex flex-col items-center text-center relative group">
+                    <div className={`w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center font-cad font-bold text-xs sm:text-sm transition-all duration-300 border mb-2 ${
+                      isDone
+                        ? "bg-[#C8922A] border-[#C8922A] text-black"
+                        : isActive
+                        ? "bg-[#C8922A]/10 border-[#C8922A] text-[#C8922A] glow-gold"
+                        : "bg-black/50 border-white/10 text-gray-500"
+                    }`}>
+                      {isDone ? <Check size={18} strokeWidth={3} /> : `0${s.num}`}
+                    </div>
+                    <span className={`text-[8px] sm:text-[9px] font-cad uppercase tracking-[0.2em] font-bold ${
+                      isActive || isDone ? "text-[#C8922A]" : "text-gray-500"
+                    }`}>
+                      {s.tag}
+                    </span>
+                    <span className={`text-[9px] sm:text-[11px] font-cinzel font-bold uppercase tracking-wider hidden sm:block ${
+                      isActive || isDone ? "text-[#EDEBE6]" : "text-gray-600"
+                    }`}>
+                      {s.title}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        <div className="bg-[#111111] rounded-lg border border-white/10 shadow-md relative overflow-hidden">
+        {/* Form Container with Architectural CAD Corner Accents */}
+        <div className="bg-[#0C0C0C] border border-white/[0.08] relative overflow-hidden shadow-2xl">
+          <div className="absolute -top-2 -left-2 w-5 h-5 border-t-2 border-l-2 border-[#C8922A]" />
+          <div className="absolute -top-2 -right-2 w-5 h-5 border-t-2 border-r-2 border-[#C8922A]" />
+          <div className="absolute -bottom-2 -left-2 w-5 h-5 border-b-2 border-l-2 border-[#C8922A]" />
+          <div className="absolute -bottom-2 -right-2 w-5 h-5 border-b-2 border-r-2 border-[#C8922A]" />
           
-          {/* Step 1: Event Selection */}
+          {/* STEP 1: EVENT SELECTION */}
           {step === 1 && (
-            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
-              <div className="text-center">
-                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
-                  Event Selection
-                </h3>
-                <p className="text-gray-400 text-xs sm:text-sm">
-                  Technical: ₹{techBaseFee} | Non-Technical: ₹{nonTechBaseFee}
-                </p>
-                {hasTechSelected && (
-                  <div className="mt-3 sm:mt-4 inline-flex items-center gap-2 bg-gold/10 border border-gold/20 px-3 sm:px-4 py-1 rounded">
-                    <Check size={14} className="text-gold" />
-                    <span className="text-[9px] sm:text-[10px] font-black text-gold uppercase tracking-wider sm:tracking-widest">
-                      Bundle: 1 Free Non-Tech
-                    </span>
+            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+              <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase">MODULE 01</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8922A]" />
+                    <span className="text-[10px] text-gray-400 font-cad uppercase">EVENT SPECIFICATIONS</span>
                   </div>
-                )}
+                  <h2 className="font-cinzel font-black text-xl sm:text-2xl text-[#EDEBE6] uppercase">
+                    Select Your Competitions
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-3 bg-black/60 border border-white/[0.08] px-4 py-2 text-xs font-cad">
+                  <span className="text-gray-400">Tech: <strong className="text-[#C8922A]">₹{techBaseFee}</strong></span>
+                  <span className="text-white/20">|</span>
+                  <span className="text-gray-400">Non-Tech: <strong className="text-[#C8922A]">₹{nonTechBaseFee}</strong></span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {/* Bundle Callout Banner */}
+              {hasTechSelected && (
+                <div className="bg-[#C8922A]/10 border border-[#C8922A]/30 p-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Sparkles className="text-[#C8922A] flex-shrink-0" size={20} />
+                    <div>
+                      <p className="text-xs font-bold text-[#C8922A] font-cad uppercase tracking-wider">
+                        BUNDLE UNLOCKED: 1 FREE NON-TECHNICAL EVENT
+                      </p>
+                      <p className="text-[10px] text-gray-400 font-cad">
+                        Your Technical Registration automatically includes 1 complimentary Non-Technical Event entrance.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 bg-[#C8922A] text-black text-[9px] font-black uppercase font-cad tracking-widest flex-shrink-0">
+                    APPLIED
+                  </span>
+                </div>
+              )}
+
+              {/* Event Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {activeEvents.map(event => {
                   const isSelected = form.selectedEvents.includes(event.id);
                   const isNonTech = event.category === Pt.NON_TECHNICAL;
                   const isBundleActiveForEvent = hasTechSelected && isNonTech;
-                  
-                  // Disable subsequent non-tech if already selected one (max 1 free non-tech under bundle)
+
                   const hasAlreadySelectedNonTech = form.selectedEvents.some(id => {
                     const matched = activeEvents.find(e => e.id === id);
                     return matched && matched.category === Pt.NON_TECHNICAL;
@@ -327,169 +397,204 @@ export default function Register() {
                     <div
                       key={event.id}
                       onClick={() => !isLockedNonTech && toggleEventSelection(event.id)}
-                      className={`p-4 rounded-2xl border transition-all ${
-                        isLockedNonTech ? "opacity-20 grayscale cursor-not-allowed" : "cursor-pointer"
+                      className={`p-5 border transition-all duration-300 relative group ${
+                        isLockedNonTech
+                          ? "opacity-30 grayscale cursor-not-allowed bg-black/40 border-white/5"
+                          : "cursor-pointer"
                       } ${
                         isSelected
-                          ? "bg-gold/10 border-gold shadow-[0_0_15px_rgba(255,215,0,0.1)]"
-                          : "bg-white/5 border-white/10 hover:border-gold/50"
+                          ? "bg-[#C8922A]/10 border-[#C8922A] shadow-[0_0_20px_rgba(200,146,42,0.15)]"
+                          : "bg-[#090909] border-white/[0.08] hover:border-[#C8922A]/50 hover:bg-[#111111]"
                       }`}
                     >
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-bold text-white uppercase tracking-wider text-sm">
-                          {event.title}
-                        </h4>
-                        {isSelected ? (
-                          <Check className="text-gold" size={18} />
-                        ) : isBundleActiveForEvent ? (
-                          <span className="text-[9px] text-gold font-black bg-gold/5 px-2 py-0.5 rounded border border-gold/20">
-                            FREE
+                      <div className="flex justify-between items-start mb-3">
+                        <div>
+                          <span className={`text-[8px] font-cad uppercase tracking-[0.2em] px-2 py-0.5 border ${
+                            event.category === Pt.TECHNICAL ? "border-amber-500/30 text-amber-400 bg-amber-500/5" : "border-cyan-500/30 text-cyan-400 bg-cyan-500/5"
+                          }`}>
+                            {event.category}
                           </span>
-                        ) : null}
+                          <h4 className="font-cinzel font-bold text-sm sm:text-base text-[#EDEBE6] uppercase tracking-wide mt-2">
+                            {event.title}
+                          </h4>
+                        </div>
+
+                        <div className={`w-6 h-6 flex items-center justify-center border transition-colors ${
+                          isSelected ? "bg-[#C8922A] border-[#C8922A] text-black" : "border-white/20 text-transparent"
+                        }`}>
+                          <Check size={14} strokeWidth={3} />
+                        </div>
                       </div>
 
-                      <div className="flex justify-between items-center text-[10px] uppercase tracking-widest font-bold">
-                        <span className="text-gray-400">{event.category}</span>
-                        <span className="text-gold">₹{isBundleActiveForEvent ? "0" : event.fee}</span>
+                      <p className="text-[11px] text-gray-400 font-cad line-clamp-2 mb-4 leading-relaxed">
+                        {event.description}
+                      </p>
+
+                      <div className="flex justify-between items-center text-[10px] font-cad uppercase tracking-wider pt-3 border-t border-white/[0.06]">
+                        <span className="text-gray-500 flex items-center gap-1">
+                          <Users size={12} /> Max: {event.maxMembers} Member{event.maxMembers > 1 ? 's' : ''}
+                        </span>
+                        <span className="font-bold text-[#C8922A] text-xs">
+                          {isBundleActiveForEvent ? (
+                            <span className="text-emerald-400 font-black">FREE (BUNDLE)</span>
+                          ) : (
+                            `₹${event.fee}`
+                          )}
+                        </span>
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="p-4 sm:p-5 bg-black/40 rounded-2xl border border-white/5 flex flex-col gap-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-400 font-bold uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest">
-                    Base Rate:
-                  </span>
-                  <span className="text-lg sm:text-xl font-cinzel font-bold text-gold">
-                    ₹{baseRate} / Head
-                  </span>
-                </div>
-                {hasTechSelected && (
-                  <p className="text-[9px] text-gold/60 italic font-medium">
-                    * Bundle applied: Access to all Tech events + 1 Non-Tech.
+              {/* Summary Fee Box */}
+              <div className="p-5 bg-[#080808] border border-white/[0.08] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <span className="text-[10px] text-gray-500 font-cad uppercase tracking-widest">CALCULATED RATE</span>
+                  <p className="text-xs text-[#EDEBE6] font-cad">
+                    Selected Events: <strong className="text-[#C8922A]">{form.selectedEvents.length}</strong>
                   </p>
-                )}
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] text-gray-400 font-cad uppercase">HEAD RATE</span>
+                  <p className="font-cinzel font-black text-2xl text-[#C8922A]">
+                    ₹{baseRate} <span className="text-xs text-gray-400 font-cad">/ Participant</span>
+                  </p>
+                </div>
               </div>
 
-              <div className="pt-4">
-                <button
-                  onClick={handleNextStep}
-                  disabled={form.selectedEvents.length === 0}
-                  className="w-full bg-gold text-black py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#B07A20] transition-all disabled:opacity-50 glow-gold uppercase tracking-widest text-sm"
-                >
-                  Confirm Team Details <ArrowRight size={20} />
-                </button>
-              </div>
+              <button
+                onClick={handleNextStep}
+                disabled={form.selectedEvents.length === 0}
+                className="w-full btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
+              >
+                PROCEED TO TEAM PROFILES <ArrowRight size={16} />
+              </button>
             </div>
           )}
 
-          {/* Step 2: Team Profiles */}
+          {/* STEP 2: TEAM PROFILES */}
           {step === 2 && (
-            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
-              <div className="text-center">
-                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
-                  Team Profiles
-                </h3>
-                
-                <div className="flex items-center justify-center gap-2 sm:gap-3 bg-gold/5 border border-gold/10 py-2 px-3 sm:px-4 rounded max-w-fit mx-auto">
-                  <UserGroup className="text-gold" size={14} />
-                  <span className="text-[10px] sm:text-xs font-bold text-gold uppercase tracking-wider sm:tracking-widest">
-                    Capacity: {totalParticipants} / {maxTeamCapacity}
+            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+              <div className="border-b border-white/[0.08] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase">MODULE 02</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#C8922A]" />
+                    <span className="text-[10px] text-gray-400 font-cad uppercase">PARTICIPANT ROSTER</span>
+                  </div>
+                  <h2 className="font-cinzel font-black text-xl sm:text-2xl text-[#EDEBE6] uppercase">
+                    Team Roster & Profile Details
+                  </h2>
+                </div>
+
+                <div className="flex items-center gap-2 bg-[#C8922A]/10 border border-[#C8922A]/30 px-3 py-1.5">
+                  <Users size={14} className="text-[#C8922A]" />
+                  <span className="text-[10px] font-cad font-bold text-[#C8922A] uppercase tracking-wider">
+                    Total Members: {totalParticipants} / {maxTeamCapacity}
                   </span>
                 </div>
-                {hasTechSelected && (
-                  <p className="text-[8px] sm:text-[9px] text-gray-400 uppercase tracking-widest mt-2 font-bold">
-                    Team size controlled by selected Technical events
-                  </p>
-                )}
               </div>
 
               {/* Primary Participant Form */}
-              <div className="bg-black/20 p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5 mb-4 sm:mb-6">
-                <h4 className="text-gold text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-5 sm:mb-8 flex items-center gap-2 sm:gap-3">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
+              <div className="bg-[#080808] border border-white/[0.08] p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-3 border-b border-white/[0.06] pb-4">
+                  <div className="w-7 h-7 bg-[#C8922A]/20 border border-[#C8922A] flex items-center justify-center text-[#C8922A]">
                     <Smartphone size={14} />
                   </div>
-                  Primary Participant
-                </h4>
+                  <h3 className="font-cinzel font-bold text-sm text-[#EDEBE6] uppercase tracking-wider">
+                    01 // Primary Participant (Leader)
+                  </h3>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-8">
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Full Name</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-wider">Full Name *</label>
                     <input
                       type="text"
                       required
                       value={form.name}
                       onChange={e => setForm({ ...form, name: e.target.value })}
-                      placeholder="As per ID"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-sm"
+                      placeholder="e.g. John Doe"
+                      className="civil-input text-xs"
                     />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">College</label>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-wider">College Institution *</label>
                     <input
                       type="text"
                       required
                       value={form.college}
                       onChange={e => setForm({ ...form, college: e.target.value })}
-                      placeholder="Current Institution"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-sm"
+                      placeholder="e.g. GCE Erode"
+                      className="civil-input text-xs"
                     />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Department</label>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-wider">Department *</label>
                     <input
                       type="text"
                       required
                       value={form.department}
                       onChange={e => setForm({ ...form, department: e.target.value })}
-                      placeholder="e.g. Civil, ECE"
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-sm"
+                      placeholder="e.g. Civil Engineering"
+                      className="civil-input text-xs"
                     />
                   </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Phone</label>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-wider">Phone Number *</label>
                     <input
                       type="tel"
                       maxLength={10}
                       required
                       value={form.phone}
                       onChange={e => setForm({ ...form, phone: e.target.value.replace(/\D/g, "") })}
-                      placeholder="10-digit number"
-                      className={`w-full bg-white/5 border ${validationErrors.phone ? "border-red-500" : "border-white/10"} rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-sm`}
+                      placeholder="10-digit mobile number"
+                      className={`civil-input text-xs ${validationErrors.phone ? "border-red-500" : ""}`}
                     />
+                    {validationErrors.phone && <p className="text-[9px] text-red-400 font-cad">{validationErrors.phone}</p>}
                   </div>
-                  <div className="space-y-3 md:col-span-2">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Email</label>
+
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-wider">Email Address *</label>
                     <input
                       type="email"
                       required
                       value={form.email}
                       onChange={e => setForm({ ...form, email: e.target.value })}
-                      placeholder="leader@example.com"
-                      className={`w-full bg-white/5 border ${validationErrors.email ? "border-red-500" : "border-white/10"} rounded-xl px-4 py-4 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-sm`}
+                      placeholder="participant@domain.com"
+                      className={`civil-input text-xs ${validationErrors.email ? "border-red-500" : ""}`}
                     />
+                    {validationErrors.email && <p className="text-[9px] text-red-400 font-cad">{validationErrors.email}</p>}
                   </div>
                 </div>
               </div>
 
-              {/* Secondary Team Members Form */}
+              {/* Secondary Team Members */}
               {maxTeamCapacity > 1 && (
-                <div className="bg-black/20 p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-white/5">
-                  <h4 className="text-gold text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] sm:tracking-[0.4em] mb-5 sm:mb-8 flex items-center gap-2 sm:gap-3">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
-                      <Users size={14} />
+                <div className="bg-[#080808] border border-white/[0.08] p-6 sm:p-8 space-y-6">
+                  <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-7 h-7 bg-[#C8922A]/20 border border-[#C8922A] flex items-center justify-center text-[#C8922A]">
+                        <Users size={14} />
+                      </div>
+                      <h3 className="font-cinzel font-bold text-sm text-[#EDEBE6] uppercase tracking-wider">
+                        02 // Additional Team Members
+                      </h3>
                     </div>
-                    Team Members (+₹{baseRate} each)
-                  </h4>
+                    <span className="text-[9px] font-cad text-[#C8922A]">
+                      +₹{baseRate} / Additional Member
+                    </span>
+                  </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {form.teamMembers.map((member, index) => (
                       <div key={index} className="space-y-2">
-                        <label className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                          Member {index + 2} Name
+                        <label className="text-[10px] font-cad text-gray-400 uppercase">
+                          Member {index + 2} Name (Optional)
                         </label>
                         <input
                           type="text"
@@ -499,8 +604,8 @@ export default function Register() {
                             newMembers[index] = e.target.value;
                             setForm({ ...form, teamMembers: newMembers });
                           }}
-                          placeholder="Optional Name"
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-xs"
+                          placeholder={`Team Member ${index + 2}`}
+                          className="civil-input text-xs"
                         />
                       </div>
                     ))}
@@ -508,28 +613,25 @@ export default function Register() {
                 </div>
               )}
 
-              {/* Summary Fee banner */}
-              <div className="p-4 sm:p-5 bg-gold/5 border border-gold/10 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
-                <div className="flex items-center gap-3">
-                  <Users className="text-gold" size={20} />
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase">Payable Total</p>
-                    <p className="text-white text-xs font-bold">
-                      {totalParticipants} Participants × ₹{baseRate}
-                    </p>
-                  </div>
+              {/* Summary Fee Banner */}
+              <div className="p-5 bg-[#C8922A]/10 border border-[#C8922A]/30 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                  <span className="text-[9px] text-[#C8922A] font-cad font-bold uppercase tracking-widest">PAYABLE TOTAL FILLS</span>
+                  <p className="text-xs text-[#EDEBE6] font-cad">
+                    {totalParticipants} Participant{totalParticipants > 1 ? 's' : ''} × ₹{baseRate} Base Fee
+                  </p>
                 </div>
-                <p className="text-xl sm:text-2xl font-cinzel font-black text-gold">
+                <div className="font-cinzel font-black text-2xl text-[#C8922A]">
                   ₹{totalPayableFee}
-                </p>
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={handlePrevStep}
-                  className="sm:flex-1 border border-white/20 text-white py-3.5 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs order-2 sm:order-1"
+                  className="sm:flex-1 btn-ghost justify-center py-4 text-xs tracking-widest"
                 >
-                  <ArrowLeft size={16} /> Back
+                  <ArrowLeft size={16} /> BACK
                 </button>
                 <button
                   onClick={handleNextStep}
@@ -537,192 +639,221 @@ export default function Register() {
                     !form.name || !form.college || !form.department || !form.email || !form.phone ||
                     !!validationErrors.email || !!validationErrors.phone
                   }
-                  className="sm:flex-[2] bg-gold text-black py-3.5 sm:py-4 rounded-xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs flex items-center justify-center gap-2 hover:bg-[#B07A20] transition-all disabled:opacity-30 glow-gold order-1 sm:order-2"
+                  className="sm:flex-[2] btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
                 >
-                  Proceed to Payment <ArrowRight size={16} />
+                  PROCEED TO PAYMENT <ArrowRight size={16} />
                 </button>
               </div>
             </div>
           )}
 
-          {/* Step 3: Secure Payment */}
+          {/* STEP 3: SECURE PAYMENT */}
           {step === 3 && (
-            <div className="p-5 sm:p-8 md:p-12 space-y-6 sm:space-y-8 animate-fade-in-up">
-              <div className="text-center">
-                <h3 className="text-2xl sm:text-3xl font-cinzel font-bold text-white mb-2 uppercase tracking-wider sm:tracking-widest">
-                  Secure Payment
-                </h3>
-                <p className="text-gray-400 text-sm">
-                  Total Payable: <span className="text-gold font-bold">₹{totalPayableFee}</span>
-                </p>
+            <div className="p-6 sm:p-10 md:p-12 space-y-8 animate-fade-in">
+              <div className="border-b border-white/[0.08] pb-6">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase">MODULE 03</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#C8922A]" />
+                  <span className="text-[10px] text-gray-400 font-cad uppercase">TRANSACTION VERIFICATION</span>
+                </div>
+                <h2 className="font-cinzel font-black text-xl sm:text-2xl text-[#EDEBE6] uppercase">
+                  UPI Payment & Verification
+                </h2>
               </div>
 
-              <div className="flex flex-col items-center max-w-md mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 {/* QR Code Container */}
-                <div className="bg-white p-4 sm:p-6 rounded-lg border-4 border-gold glow-gold shadow-md mb-8 sm:mb-12">
-                  <img src={upiQrCodeUrl} alt="Payment QR Code" className="w-48 h-48 sm:w-64 sm:h-64 object-contain mx-auto" />
-                  <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100 flex flex-col items-center">
-                    <p className="text-black font-black text-sm sm:text-xl tracking-widest break-all text-center">{upiId}</p>
-                    <p className="text-gray-400 text-[9px] sm:text-[10px] uppercase font-black mt-2 text-center">
-                      Department of Civil Engineering GCE Erode
+                <div className="bg-[#080808] border border-white/[0.08] p-6 text-center relative group">
+                  <div className="absolute -top-1 -left-1 w-3 h-3 border-t border-l border-[#C8922A]" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 border-t border-r border-[#C8922A]" />
+                  <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b border-l border-[#C8922A]" />
+                  <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b border-r border-[#C8922A]" />
+
+                  <span className="text-[9px] text-[#C8922A] font-cad font-bold uppercase tracking-widest block mb-4">
+                    SCAN TO PAY EXACT AMOUNT
+                  </span>
+
+                  <div className="bg-white p-4 inline-block border-2 border-[#C8922A] shadow-xl mb-4">
+                    <img src={upiQrCodeUrl} alt="Payment QR Code" className="w-44 h-44 sm:w-52 sm:h-52 object-contain mx-auto" />
+                  </div>
+
+                  <div className="bg-black/80 border border-white/[0.08] p-3 text-center">
+                    <p className="text-xs font-cad font-bold text-[#EDEBE6] select-all">{upiId}</p>
+                    <p className="text-[9px] text-gray-400 font-cad uppercase mt-1">
+                      Civil Dept GCE Erode
                     </p>
                   </div>
                 </div>
 
-                {/* Important Notes */}
-                <div className="w-full bg-amber-900/10 border border-amber-900/30 rounded-xl sm:rounded-2xl p-4 sm:p-5 mb-6 sm:mb-8">
-                  <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-widest mb-3 flex items-center gap-2">
-                    <Info size={14} /> Important Notes
-                  </h5>
-                  <ul className="text-[10px] text-gray-400 space-y-2 list-disc pl-4 font-medium">
-                    <li>Pay the exact amount shown (₹{totalPayableFee}) using any UPI app.</li>
-                    <li>After payment, wait for the transaction to complete.</li>
-                    <li>Copy the <span className="text-white font-bold">12-digit UTR / Transaction ID</span> from your app.</li>
-                    <li>Enter the ID below to generate your downloadable entry pass instantly.</li>
-                  </ul>
-                </div>
-
-                {/* UTR Input Form */}
-                <div className="w-full space-y-3">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block text-center">
-                    Enter Transaction ID (UTR)
-                  </label>
-                  <div className="relative">
-                    <ShieldCheck className={`absolute left-4 top-1/2 -translate-y-1/2 ${
-                      form.transactionId.length === 12 ? "text-gold" : "text-gray-400"
-                    }`} size={18} />
-                    <input
-                      type="text"
-                      required
-                      maxLength={12}
-                      value={form.transactionId}
-                      onChange={e => {
-                        const val = e.target.value.replace(/\D/g, "");
-                        setForm({ ...form, transactionId: val });
-                      }}
-                      placeholder="12-digit code"
-                      className={`w-full bg-white/5 border ${
-                        validationErrors.transactionId ? "border-amber-500" : "border-white/10"
-                      } rounded-2xl pl-12 pr-4 py-5 text-white focus:outline-none focus:border-[#C8922A] transition-colors text-center font-black tracking-[0.4em] text-xl`}
-                    />
+                {/* Verification & UTR Input */}
+                <div className="space-y-6">
+                  <div className="bg-[#080808] border border-white/[0.08] p-5 space-y-3">
+                    <div className="flex items-center gap-2 text-[#C8922A] text-xs font-cad font-bold uppercase">
+                      <Info size={14} /> Verification Guidelines
+                    </div>
+                    <ul className="text-[11px] text-gray-400 font-cad space-y-2 list-disc pl-4 leading-relaxed">
+                      <li>Pay exact total: <strong className="text-[#C8922A]">₹{totalPayableFee}</strong> using GPay, PhonePe, or Paytm.</li>
+                      <li>Copy the <strong className="text-white">12-Digit Transaction Ref / UTR ID</strong> from your UPI app receipt.</li>
+                      <li>Paste the UTR number below to generate your entry pass instantly.</li>
+                    </ul>
                   </div>
+
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-cad font-bold text-gray-400 uppercase tracking-widest block">
+                      12-Digit Transaction ID (UTR) *
+                    </label>
+                    <div className="relative">
+                      <ShieldCheck className={`absolute left-4 top-1/2 -translate-y-1/2 ${
+                        isUtrValid ? "text-[#C8922A]" : "text-gray-500"
+                      }`} size={18} />
+                      <input
+                        type="text"
+                        required
+                        maxLength={12}
+                        value={form.transactionId}
+                        onChange={e => {
+                          const val = e.target.value.replace(/\D/g, "");
+                          setForm({ ...form, transactionId: val });
+                        }}
+                        placeholder="e.g. 423456789012"
+                        className={`civil-input pl-12 pr-4 py-4 text-center font-cad font-bold tracking-[0.3em] text-lg ${
+                          validationErrors.transactionId ? "border-amber-500" : ""
+                        }`}
+                      />
+                    </div>
+                    {isUtrValid && (
+                      <p className="text-[10px] text-emerald-400 font-cad font-bold text-center flex items-center justify-center gap-1">
+                        <Check size={12} /> 12-Digit Format Valid
+                      </p>
+                    )}
+                  </div>
+
+                  {error && (
+                    <div className="p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-cad text-center">
+                      {error.message}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {error && (
-                <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-xs rounded-xl text-center">
-                  {error.message}
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/[0.08]">
                 <button
                   onClick={handlePrevStep}
-                  className="sm:flex-1 border border-white/20 text-white py-3.5 sm:py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all hover:bg-white/5 uppercase tracking-widest text-xs order-2 sm:order-1"
+                  className="sm:flex-1 btn-ghost justify-center py-4 text-xs tracking-widest"
                 >
-                  <ArrowLeft size={16} /> Back
+                  <ArrowLeft size={16} /> BACK
                 </button>
                 <button
                   onClick={handleRegistrationSubmit}
                   disabled={isSubmitting || !isUtrValid}
-                  className={`sm:flex-[2] py-3.5 sm:py-4 rounded-xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs flex items-center justify-center gap-2 transition-all shadow-lg order-1 sm:order-2 ${
-                    isUtrValid
-                      ? "bg-gold text-black hover:bg-[#B07A20] glow-gold"
-                      : "bg-white/5 text-gray-400 border border-white/5 cursor-not-allowed opacity-30"
-                  }`}
+                  className="sm:flex-[2] btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
                 >
                   {isSubmitting ? (
                     <Loader className="animate-spin" size={18} />
                   ) : (
                     <ShieldCheck size={18} />
                   )}
-                  {isSubmitting ? "Confirming..." : "Complete & Download"}
+                  {isSubmitting ? "VERIFYING & GENERATING PASS..." : "SUBMIT & GET ENTRY PASS"}
                 </button>
               </div>
             </div>
           )}
 
-          {/* Step 4: Success Pass View */}
+          {/* STEP 4: REGISTRATION SUCCESS & ENTRY PASS */}
           {step === 4 && createdRecord && (
-            <div className="p-5 sm:p-8 md:p-12 text-center animate-fade-in-up bg-gradient-to-b from-[#111] to-[#0A0A0A]">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-500/10 text-green-500 rounded flex items-center justify-center mx-auto mb-5 sm:mb-8 border border-green-500/20 animate-pulse-gold">
+            <div className="p-6 sm:p-10 md:p-12 text-center animate-fade-in space-y-8">
+              <div className="w-16 h-16 bg-[#C8922A]/20 border border-[#C8922A] text-[#C8922A] flex items-center justify-center mx-auto glow-gold">
                 <Check size={32} strokeWidth={3} />
               </div>
-              <h3 className="text-2xl sm:text-3xl md:text-5xl font-cinzel font-black text-white mb-3 sm:mb-4 tracking-wider sm:tracking-widest uppercase">
-                REGISTRATION SUCCESS
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-400 mb-6 sm:mb-8 max-w-md mx-auto leading-relaxed">
-                Payment logged for ID: <span className="text-gold font-mono break-all">{createdRecord.transactionId}</span>. Your pass is ready!
-              </p>
 
-              {/* Whatsapp Communities */}
-              <div className="mb-12 max-w-md mx-auto">
-                <h4 className="text-xs font-black text-gold uppercase tracking-[0.4em] mb-4 flex items-center justify-center gap-2">
-                  <UserGroup size={14} /> Join Event Communities
-                </h4>
-                <div className="flex flex-col gap-3">
-                  {form.selectedEvents.map(id => {
-                    const matchedEvent = activeEvents.find(e => e.id === id);
-                    if (matchedEvent && matchedEvent.whatsappLink) {
-                      return (
-                        <a
-                          key={id}
-                          href={matchedEvent.whatsappLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-[#25D366]/10 border border-[#25D366]/20 p-4 rounded-2xl flex items-center justify-between hover:bg-[#25D366]/20 transition-all group"
-                        >
-                          <div className="text-left">
-                            <p className="text-[9px] text-gray-400 font-bold uppercase mb-0.5">{matchedEvent.category}</p>
-                            <p className="text-white font-bold text-xs uppercase tracking-widest">{matchedEvent.title}</p>
-                          </div>
-                          <div className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#25D366]/20 group-hover:scale-105 transition-transform">
-                            Join Group
-                          </div>
-                        </a>
-                      );
-                    }
-                    return null;
-                  })}
-                </div>
-                <p className="text-[10px] text-gray-400 mt-4 italic">
-                  Important: Only join groups for events you have registered in.
+              <div>
+                <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-[0.3em]">
+                  REGISTRATION COMPLETED
+                </span>
+                <h2 className="font-cinzel font-black text-2xl sm:text-4xl text-[#EDEBE6] uppercase tracking-wide mt-1 mb-2">
+                  OFFICIAL ENTRY PASS GENERATED
+                </h2>
+                <p className="text-xs text-gray-400 font-cad max-w-md mx-auto">
+                  Transaction logged under Ref: <span className="text-[#C8922A] font-bold">{createdRecord.transactionId}</span>. Status: <strong className="text-amber-400">Verification Pending</strong>.
                 </p>
               </div>
 
-              {/* Entry Pass Card (To be downloaded) */}
-              <div className="relative max-w-xs sm:max-w-sm mx-auto group mb-8 sm:mb-12">
-                <div className="absolute inset-0 bg-gold/20 blur-[60px] sm:blur-[80px] rounded opacity-40" />
-                <div ref={passRef} className="relative bg-black border-2 border-gold/40 rounded-[2rem] sm:rounded-[3.5rem] p-6 sm:p-10 shadow-md overflow-hidden">
-                  <div className="relative z-10">
-                    <div className="flex justify-between items-start mb-10">
-                      <div className="text-left">
-                        <p className="text-[10px] text-gold font-black uppercase tracking-[0.4em] mb-1">ADAGE PASS</p>
-                        <h4 className="text-xl font-cinzel font-black text-white glow-text-gold tracking-widest">ADAGE'26</h4>
-                      </div>
-                      <div className="w-8 h-8 rounded-lg bg-gold/10 flex items-center justify-center text-gold">
-                        <Award size={20} />
-                      </div>
-                    </div>
+              {/* WhatsApp Community Groups */}
+              {form.selectedEvents.some(id => activeEvents.find(e => e.id === id)?.whatsappLink) && (
+                <div className="max-w-md mx-auto bg-[#080808] border border-white/[0.08] p-5 text-left space-y-3">
+                  <span className="text-[10px] text-[#C8922A] font-cad font-bold uppercase tracking-wider block">
+                    JOIN OFFICIAL EVENT WHATSAPP GROUPS
+                  </span>
+                  <div className="space-y-2">
+                    {form.selectedEvents.map(id => {
+                      const matched = activeEvents.find(e => e.id === id);
+                      if (matched && matched.whatsappLink) {
+                        return (
+                          <a
+                            key={id}
+                            href={matched.whatsappLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-between bg-black border border-white/10 p-3 hover:border-[#25D366] transition-colors group"
+                          >
+                            <span className="text-xs font-cad font-bold text-[#EDEBE6]">{matched.title}</span>
+                            <span className="text-[10px] font-cad font-bold text-[#25D366] group-hover:underline flex items-center gap-1">
+                              Join Group <ChevronRight size={12} />
+                            </span>
+                          </a>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                </div>
+              )}
 
-                    <div className="bg-white p-5 rounded-lg mb-10 border-4 border-gold/20 shadow-xl">
-                      <img src={passQrCodeUrl} alt="Pass QR" className="w-48 h-48 mx-auto" crossOrigin="anonymous" />
-                    </div>
+              {/* Digital Entry Pass Preview Card */}
+              <div className="relative max-w-sm mx-auto">
+                <div ref={passRef} className="bg-black border-2 border-[#C8922A] p-6 text-left relative overflow-hidden shadow-2xl">
+                  {/* Background CAD Grid Overlay */}
+                  <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:16px_16px]" />
 
-                    <div className="text-left space-y-4">
+                  {/* Pass Header */}
+                  <div className="flex justify-between items-start border-b border-[#C8922A]/40 pb-4 mb-5 relative z-10">
+                    <div>
+                      <span className="text-[9px] text-[#C8922A] font-cad font-bold tracking-[0.3em] uppercase block">
+                        DEPT OF CIVIL ENGG
+                      </span>
+                      <h3 className="font-cinzel font-black text-xl text-[#EDEBE6] tracking-widest uppercase">
+                        ADAGE'26 PASS
+                      </h3>
+                    </div>
+                    <Award size={24} className="text-[#C8922A]" />
+                  </div>
+
+                  {/* QR Code */}
+                  <div className="bg-white p-3 inline-block border border-[#C8922A] mb-5 relative z-10 w-full text-center">
+                    <img src={passQrCodeUrl} alt="Pass QR Code" className="w-40 h-40 mx-auto" crossOrigin="anonymous" />
+                    <span className="text-[9px] font-cad font-bold text-black block mt-1 tracking-widest">
+                      ID: {createdRecord.id}
+                    </span>
+                  </div>
+
+                  {/* Participant Info */}
+                  <div className="space-y-3 font-cad text-xs relative z-10 border-t border-white/[0.08] pt-4">
+                    <div>
+                      <span className="text-[9px] text-gray-500 uppercase tracking-wider block">NAME</span>
+                      <strong className="text-[#EDEBE6] uppercase">{createdRecord.name}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[9px] text-gray-500 uppercase tracking-wider block">COLLEGE</span>
+                      <span className="text-gray-300">{createdRecord.college}</span>
+                    </div>
+                    <div className="flex justify-between border-t border-white/[0.06] pt-2">
                       <div>
-                        <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">Participant</p>
-                        <p className="text-white font-bold uppercase text-xs">{createdRecord.name}</p>
+                        <span className="text-[9px] text-gray-500 uppercase tracking-wider block">TOTAL FEE</span>
+                        <strong className="text-[#C8922A]">₹{createdRecord.totalFee}</strong>
                       </div>
-                      <div className="flex justify-between">
-                        <div>
-                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">Pass ID</p>
-                          <p className="text-gold font-mono font-bold text-xs">{createdRecord.id}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mb-1">Fee</p>
-                          <p className="text-white font-bold text-xs">₹{createdRecord.totalFee}</p>
-                        </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-gray-500 uppercase tracking-wider block">VERIFICATION</span>
+                        <span className="text-amber-400 font-bold">PENDING</span>
                       </div>
                     </div>
                   </div>
@@ -730,27 +861,22 @@ export default function Register() {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-col gap-3 sm:gap-5 sm:flex-row justify-center px-2 sm:px-0">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                 <button
-                  onClick={() => navigate("/dashboard")}
-                  className="bg-gold text-black px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs hover:bg-[#B07A20] transition-all glow-gold flex items-center justify-center gap-2 sm:gap-3"
+                  onClick={() => navigate("/verify")}
+                  className="btn-primary justify-center py-4 text-xs tracking-widest sm:flex-1"
                 >
-                  Check Dashboard <ArrowRight size={18} />
+                  CHECK STATUS <ArrowRight size={16} />
                 </button>
                 <button
                   onClick={handleDownloadPass}
                   disabled={isDownloading}
-                  className="bg-white/5 border border-white/10 text-white px-8 sm:px-12 py-4 sm:py-5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-xs hover:bg-white/10 transition-all flex items-center justify-center gap-2 sm:gap-3 disabled:opacity-50"
+                  className="btn-ghost justify-center py-4 text-xs tracking-widest sm:flex-1 disabled:opacity-50"
                 >
-                  {isDownloading ? (
-                    <Loader className="animate-spin" size={18} />
-                  ) : (
-                    <Download size={18} />
-                  )}
-                  Download Pass
+                  {isDownloading ? <Loader className="animate-spin" size={16} /> : <Download size={16} />}
+                  DOWNLOAD PASS
                 </button>
               </div>
-
             </div>
           )}
 
