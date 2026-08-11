@@ -14,7 +14,8 @@ import AdminHub from './components/AdminHub';
 import Dashboard from './components/Dashboard';
 
 function ProtectedRoute({ children, isAuthenticated }) {
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const isLogged = isAuthenticated || localStorage.getItem('adage_admin_logged') === 'true';
+  if (!isLogged) return <Navigate to="/login" replace />;
   return children;
 }
 

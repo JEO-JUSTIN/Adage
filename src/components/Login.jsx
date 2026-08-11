@@ -12,15 +12,17 @@ export default function Login({ onLogin }) {
     e.preventDefault();
     setLoading(true);
     setError('');
+    const inputKey = key.trim();
     setTimeout(() => {
-      if (key === 'admin123') {
+      if (inputKey === 'admin123') {
+        localStorage.setItem('adage_admin_logged', 'true');
         onLogin();
         navigate('/admin', { replace: true });
       } else {
         setError('Invalid access key.');
         setLoading(false);
       }
-    }, 800);
+    }, 300);
   };
 
   return (
