@@ -731,40 +731,65 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
         </div>
 
         {/* Action Controls & Navigation tabs */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
-          <div className="flex items-center gap-5">
-            <div className="p-4 bg-gold/10 rounded-2xl text-gold border border-gold/20 shadow-lg">
-              <ClipboardList size={32} />
-            </div>
-            <div>
-              <h2 className="text-4xl font-cinzel font-black tracking-widest uppercase">Admin Hub</h2>
-              <div className="flex items-center gap-3 mt-1">
-                <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest font-mono">
-                  {isLoading ? "Syncing..." : "Live Connected"}
-                </p>
-                <div className={`w-1.5 h-1.5 rounded ${isLoading ? "bg-amber-500 animate-pulse" : "bg-green-500"}`} />
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-6 mb-8">
+          {/* Header Title & Status */}
+          <div className="flex items-center justify-between sm:justify-start gap-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 sm:p-4 bg-[#C8922A]/10 rounded-2xl text-[#C8922A] border border-[#C8922A]/30 shadow-lg">
+                <ClipboardList size={28} />
+              </div>
+              <div>
+                <h2 className="text-2xl sm:text-4xl font-cinzel font-black tracking-widest uppercase text-[#EDEBE6]">
+                  Admin Hub
+                </h2>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <p className="text-gray-400 text-[10px] font-cad uppercase tracking-wider font-mono">
+                    {isLoading ? "Syncing..." : "Live Connected"}
+                  </p>
+                  <div className={`w-2 h-2 rounded-full ${isLoading ? "bg-amber-500 animate-pulse" : "bg-emerald-500 glow-gold"}`} />
+                </div>
               </div>
             </div>
+
+            <button
+              onClick={() => setIsManualModalOpen(true)}
+              className="lg:hidden px-4 py-2.5 rounded-xl text-[10px] font-cad font-bold uppercase tracking-wider bg-[#C8922A] text-black hover:bg-[#B07A20] transition-all flex items-center gap-1.5 shadow-md flex-shrink-0"
+            >
+              <Plus size={14} /> New Entry
+            </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 p-1.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-xl">
-            <button onClick={() => setIsManualModalOpen(true)} className="px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest bg-white/10 text-gold hover:bg-gold hover:text-black transition-all flex items-center gap-2">
+          {/* Desktop & Mobile Tab Strip */}
+          <div className="flex items-center gap-2 w-full lg:w-auto">
+            <button
+              onClick={() => setIsManualModalOpen(true)}
+              className="hidden lg:flex px-5 py-3 rounded-xl text-[10px] font-cad font-bold uppercase tracking-wider bg-[#C8922A]/20 text-[#C8922A] border border-[#C8922A]/40 hover:bg-[#C8922A] hover:text-black transition-all items-center gap-2 flex-shrink-0"
+            >
               <Plus size={16} /> New Entry
             </button>
-            <div className="w-px h-6 bg-white/10 mx-2 hidden sm:block" />
-            
-            {["registrations", "events", "scanner", "settings"].map(t => (
-              <button
-                key={t}
-                onClick={() => { setTab(t); setIsScannerActive(false); }}
-                className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
-                  tab === t ? "bg-gold text-black shadow-lg shadow-gold/20" : "text-gray-400 hover:text-white hover:bg-white/5"
-                }`}
-              >
-                {t === "registrations" ? <ClipboardList size={16} /> : t === "events" ? <Edit size={16} /> : t === "scanner" ? <QrCode size={16} /> : <Settings size={16} />}
-                <span className="ml-1 hidden sm:inline">{t}</span>
-              </button>
-            ))}
+
+            {/* Horizontal Scrollable Tabs */}
+            <div className="flex items-center gap-1.5 p-1.5 bg-[#090909] rounded-2xl border border-white/10 w-full overflow-x-auto custom-scrollbar">
+              {[
+                { id: "registrations", label: "Registrations", icon: <ClipboardList size={16} /> },
+                { id: "events", label: "Events", icon: <Edit size={16} /> },
+                { id: "scanner", label: "Scanner", icon: <QrCode size={16} /> },
+                { id: "settings", label: "Settings", icon: <Settings size={16} /> }
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => { setTab(t.id); setIsScannerActive(false); }}
+                  className={`px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-[10px] font-cad font-bold uppercase tracking-wider transition-all flex items-center gap-2 whitespace-nowrap flex-1 justify-center ${
+                    tab === t.id
+                      ? "bg-[#C8922A] text-black shadow-lg shadow-[#C8922A]/20 font-black"
+                      : "text-gray-400 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  {t.icon}
+                  <span>{t.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
