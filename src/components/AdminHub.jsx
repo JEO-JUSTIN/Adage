@@ -801,8 +801,8 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                 </div>
               </div>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-white/5 text-[10px] uppercase text-gray-400 font-black tracking-widest">
@@ -851,6 +851,42 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Cards View */}
+              <div className="block md:hidden space-y-4">
+                {filteredRegistrations.map(participant => (
+                  <div key={participant.id} className="bg-[#080808] border border-white/10 p-5 rounded-2xl space-y-4">
+                    <div className="flex justify-between items-start gap-3">
+                      <div>
+                        <h4 className="font-cinzel font-bold text-lg text-white uppercase">{participant.name}</h4>
+                        <span className="text-[10px] font-mono text-[#C8922A] block mt-0.5">{participant.id}</span>
+                        <p className="text-[11px] text-gray-400 mt-1 uppercase">{participant.college}</p>
+                      </div>
+
+                      <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase border flex-shrink-0 ${
+                        participant.status === ut.PRESENT
+                          ? "text-blue-400 border-blue-400/30 bg-blue-400/5"
+                          : participant.status === ut.CONFIRMED
+                          ? "text-green-500 border-green-500/30 bg-green-500/5"
+                          : participant.status === ut.REVIEW
+                          ? "text-amber-400 border-amber-400/30 bg-amber-400/5"
+                          : participant.status === ut.REJECTED
+                          ? "text-red-400 border-red-400/30 bg-red-400/5"
+                          : "text-gold border-gold/30 bg-gold/5"
+                      }`}>
+                        {participant.status === ut.PRESENT ? "Checked In" : participant.status === ut.CONFIRMED ? "Confirmed" : participant.status === ut.REVIEW ? "Under Review" : participant.status === ut.REJECTED ? "Rejected" : "Pending"}
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedId(participant.id)}
+                      className="w-full py-3 bg-white/5 border border-white/10 text-gray-300 hover:text-gold rounded-xl font-cad text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2"
+                    >
+                      <ClipboardList size={14} /> VIEW DETAILS & UPDATE
+                    </button>
+                  </div>
+                ))}
               </div>
 
               {filteredRegistrations.length === 0 && (
