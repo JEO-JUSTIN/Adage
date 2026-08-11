@@ -37,7 +37,7 @@ create table registrations (
   "teamMembers" jsonb default '[]'::jsonb,
   events jsonb default '[]'::jsonb,
   "totalFee" integer default 0,
-  "transactionId" text,
+  "transactionId" text unique,
   status text not null default 'Payment Pending Verification',
   timestamp timestamptz default now()
 );

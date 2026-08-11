@@ -193,6 +193,17 @@ export default function Register() {
     setError(null);
 
     try {
+      // Check for duplicate transaction ID (UTR)
+      const { data: existingTx } = await supabase
+        .from('registrations')
+        .select('id')
+        .eq('transactionId', form.transactionId)
+        .maybeSingle();
+
+      if (existingTx) {
+        throw new Error("This 12-digit Transaction ID (UTR) has already been submitted for a registration!");
+      }
+
       const generatedId = "ADG" + Math.random().toString(36).substring(2, 8).toUpperCase();
       const payload = {
         id: generatedId,
