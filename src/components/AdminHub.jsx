@@ -1051,157 +1051,185 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
 
       {/* DETAILED PARTICIPANT DRAWER MODAL */}
       {selectedParticipant && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center px-4 bg-black/95 backdrop-blur-3xl animate-in fade-in duration-200">
-          <div className="bg-[#0C0C0C] w-full max-w-2xl rounded-xl border border-gold/30 p-12 md:p-16 relative overflow-hidden shadow-md max-h-[90vh] overflow-y-auto custom-scrollbar">
-            <button onClick={() => setSelectedId(null)} className="absolute top-10 right-10 text-gray-400 hover:text-white p-2 z-20">
-              <X size={32} />
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/95 backdrop-blur-3xl animate-in fade-in duration-200">
+          <div className="bg-[#0C0C0C] w-full max-w-3xl rounded-2xl border border-[#C8922A]/40 p-6 sm:p-10 relative overflow-hidden shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+            
+            {/* CAD Corner Accents */}
+            <div className="absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-[#C8922A]" />
+            <div className="absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-[#C8922A]" />
+            <div className="absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-[#C8922A]" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-[#C8922A]" />
+
+            <button onClick={() => setSelectedId(null)} className="absolute top-6 right-6 text-gray-400 hover:text-white p-2 z-20 transition-colors">
+              <X size={28} />
             </button>
 
-            <div className="relative z-10 space-y-10">
-              <div className="flex items-center gap-8">
-                <div className="p-6 bg-gold/10 text-gold rounded-3xl border border-gold/10">
-                  <Users size={48} />
+            <div className="relative z-10 space-y-8">
+              
+              {/* Header Info & Current Status Banner */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-white/10 pb-6">
+                <div className="flex items-center gap-5">
+                  <div className="w-14 h-14 bg-[#C8922A]/10 text-[#C8922A] rounded-2xl border border-[#C8922A]/30 flex items-center justify-center flex-shrink-0">
+                    <Users size={32} />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-cinzel font-black uppercase tracking-wider text-[#EDEBE6]">
+                      {selectedParticipant.name}
+                    </h3>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] text-gray-500 font-cad uppercase">REG ID:</span>
+                      <span className="text-[#C8922A] text-xs font-cad font-bold tracking-widest">{selectedParticipant.id}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-3xl md:text-4xl font-cinzel font-black uppercase tracking-widest leading-tight">
-                    {selectedParticipant.name}
-                  </h3>
-                  <p className="text-gold text-sm font-mono tracking-widest">{selectedParticipant.id}</p>
+
+                {/* Status Badge */}
+                <div className="sm:text-right flex-shrink-0">
+                  <span className="text-[9px] text-gray-500 font-cad uppercase tracking-widest block mb-1">CURRENT STATUS</span>
+                  <span className={`px-4 py-2 rounded-xl text-xs font-cad font-bold uppercase tracking-wider inline-flex items-center gap-2 border ${
+                    selectedParticipant.status === ut.PRESENT
+                      ? "text-blue-400 border-blue-400/40 bg-blue-500/10"
+                      : selectedParticipant.status === ut.CONFIRMED
+                      ? "text-emerald-400 border-emerald-400/40 bg-emerald-500/10"
+                      : selectedParticipant.status === ut.REVIEW
+                      ? "text-amber-400 border-amber-400/40 bg-amber-500/10"
+                      : selectedParticipant.status === ut.REJECTED
+                      ? "text-red-400 border-red-400/40 bg-red-500/10"
+                      : "text-amber-300 border-amber-400/40 bg-amber-500/10 animate-pulse"
+                  }`}>
+                    {selectedParticipant.status}
+                  </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-                <div className="space-y-8">
+              {/* Status Update Actions Control Center (Bigger & Prominent) */}
+              <div className="bg-[#080808] p-6 rounded-2xl border border-[#C8922A]/30 space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-cad font-bold text-[#C8922A] uppercase tracking-[0.2em] flex items-center gap-2">
+                    <ShieldCheck size={16} /> CHANGE / UPDATE PARTICIPANT STATUS
+                  </span>
+                  <span className="text-[10px] text-gray-500 font-cad">SELECT STATUS BELOW</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <button
+                    onClick={() => onUpdateStatus(selectedParticipant.id, ut.CONFIRMED)}
+                    className={`py-4 px-4 rounded-xl text-xs font-cad font-bold uppercase tracking-wider border transition-all flex flex-col items-center justify-center gap-2 shadow-lg ${
+                      selectedParticipant.status === ut.CONFIRMED
+                        ? "bg-emerald-500 text-black border-emerald-400 font-black glow-gold"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500 hover:text-black"
+                    }`}
+                  >
+                    <CheckCircle size={20} />
+                    <span>CONFIRM PAYMENT</span>
+                  </button>
+
+                  <button
+                    onClick={() => onUpdateStatus(selectedParticipant.id, ut.REVIEW)}
+                    className={`py-4 px-4 rounded-xl text-xs font-cad font-bold uppercase tracking-wider border transition-all flex flex-col items-center justify-center gap-2 shadow-lg ${
+                      selectedParticipant.status === ut.REVIEW
+                        ? "bg-amber-500 text-black border-amber-400 font-black glow-gold"
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500 hover:text-black"
+                    }`}
+                  >
+                    <Clock size={20} />
+                    <span>UNDER REVIEW</span>
+                  </button>
+
+                  <button
+                    onClick={() => onUpdateStatus(selectedParticipant.id, ut.REJECTED)}
+                    className={`py-4 px-4 rounded-xl text-xs font-cad font-bold uppercase tracking-wider border transition-all flex flex-col items-center justify-center gap-2 shadow-lg ${
+                      selectedParticipant.status === ut.REJECTED
+                        ? "bg-red-500 text-white border-red-400 font-black"
+                        : "bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white"
+                    }`}
+                  >
+                    <X size={20} />
+                    <span>REJECT</span>
+                  </button>
+
+                  <button
+                    onClick={() => onUpdateStatus(selectedParticipant.id, ut.PRESENT)}
+                    className={`py-4 px-4 rounded-xl text-xs font-cad font-bold uppercase tracking-wider border transition-all flex flex-col items-center justify-center gap-2 shadow-lg ${
+                      selectedParticipant.status === ut.PRESENT
+                        ? "bg-blue-500 text-white border-blue-400 font-black"
+                        : "bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500 hover:text-white"
+                    }`}
+                  >
+                    <ShieldCheck size={20} />
+                    <span>CHECK-IN</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Detail Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                {/* Left Column */}
+                <div className="space-y-6 bg-[#080808] p-6 rounded-2xl border border-white/[0.08]">
                   <div>
-                    <label className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] block mb-3">Academic Identity</label>
-                    <div className="space-y-1">
-                      <p className="text-white font-bold text-lg leading-tight">{selectedParticipant.college}</p>
-                      <p className="text-gold font-black uppercase text-[10px] tracking-widest">{selectedParticipant.department}</p>
+                    <span className="text-[10px] text-gray-500 font-cad uppercase tracking-[0.2em] block mb-2">ACADEMIC INSTITUTION</span>
+                    <p className="text-white font-bold text-base">{selectedParticipant.college}</p>
+                    <p className="text-[#C8922A] text-xs font-cad uppercase mt-0.5">{selectedParticipant.department}</p>
+                  </div>
+
+                  <div className="border-t border-white/[0.06] pt-4 space-y-3">
+                    <span className="text-[10px] text-gray-500 font-cad uppercase tracking-[0.2em] block">CONTACT DETAILS</span>
+                    <div className="flex items-center gap-3 text-gray-300 text-xs font-cad">
+                      <Mail size={14} className="text-[#C8922A]" />
+                      <span>{selectedParticipant.email}</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-gray-300 text-xs font-cad">
+                      <Phone size={14} className="text-[#C8922A]" />
+                      <span>{selectedParticipant.phone}</span>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] block mb-3">Secure Communication</label>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-white/80 text-sm">
-                        <Mail size={14} className="text-gold/50" />
-                        <span className="font-medium">{selectedParticipant.email}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-white/80 text-sm">
-                        <Phone size={14} className="text-gold/50" />
-                        <span className="font-medium">{selectedParticipant.phone}</span>
-                      </div>
+                  <div className="border-t border-white/[0.06] pt-4 space-y-2 font-cad text-xs">
+                    <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] block">PAYMENT INFORMATION</span>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">12-Digit UTR:</span>
+                      <strong className="text-[#C8922A] tracking-wider">{selectedParticipant.transactionId}</strong>
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] block mb-3">Digital Fingerprint</label>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-[10px] text-gray-400">
-                        <span>Transaction</span>
-                        <span className="text-gold font-mono tracking-widest">{selectedParticipant.transactionId}</span>
-                      </div>
-                      <div className="flex justify-between items-center text-[10px] text-gray-400">
-                        <span>Registered</span>
-                        <div className="flex items-center gap-2">
-                          <Calendar size={10} />
-                          <span>{new Date(selectedParticipant.timestamp).toLocaleString()}</span>
-                        </div>
-                      </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Total Fee:</span>
+                      <strong className="text-white">₹{selectedParticipant.totalFee || 0}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Submitted On:</span>
+                      <span className="text-gray-400 text-[11px]">{new Date(selectedParticipant.timestamp).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-8">
-                  <div className={`p-8 rounded-lg border flex flex-col justify-center text-center shadow-inner ${
-                    selectedParticipant.status === ut.PRESENT ? "bg-blue-500/10 border-blue-500/40" : "bg-green-500/10 border-green-500/40"
-                  }`}>
-                    <label className="text-[9px] font-black uppercase tracking-widest block mb-4 text-gray-400">Venue Status</label>
-                    <p className={`text-2xl md:text-3xl font-cinzel font-bold uppercase tracking-widest ${
-                      selectedParticipant.status === ut.PRESENT ? "text-blue-400" : "text-green-500"
-                    }`}>
-                      {selectedParticipant.status}
-                    </p>
-                  </div>
-
-                  {selectedParticipant.teamMembers.length > 0 && (
-                    <div className="bg-white/5 p-6 rounded-3xl border border-white/5">
-                      <label className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] block mb-4">Confirmed Team</label>
-                      <div className="flex flex-col gap-3">
-                        {selectedParticipant.teamMembers.map((m, idx) => (
-                          <div key={idx} className="flex items-center gap-3">
-                            <div className="w-1.5 h-1.5 rounded bg-gold/40" />
-                            <span className="text-xs text-white/90 font-bold uppercase tracking-wide">{m}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
+                {/* Right Column */}
+                <div className="space-y-6 bg-[#080808] p-6 rounded-2xl border border-white/[0.08]">
                   <div>
-                    <label className="text-[9px] text-gray-400 font-black uppercase tracking-[0.2em] block mb-3">Event Roster</label>
+                    <span className="text-[10px] text-gray-500 font-cad uppercase tracking-[0.2em] block mb-3">REGISTERED COMPETITIONS</span>
                     <div className="flex flex-wrap gap-2">
                       {selectedParticipant.events.map((eTitle, idx) => (
-                        <span key={idx} className="bg-gold/5 text-gold text-[10px] font-bold uppercase px-3 py-1 rounded-lg border border-gold/10">
+                        <span key={idx} className="bg-[#C8922A]/10 text-[#C8922A] text-xs font-cad font-bold uppercase px-3 py-1.5 rounded-lg border border-[#C8922A]/30">
                           {eTitle}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Status Action Buttons */}
-                  <div className="bg-[#080808] p-5 rounded-xl border border-white/10 space-y-3">
-                    <label className="text-[9px] font-black uppercase tracking-[0.2em] block text-[#C8922A]">
-                      UPDATE REGISTRATION STATUS
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.CONFIRMED)}
-                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
-                          selectedParticipant.status === ut.CONFIRMED
-                            ? "bg-green-500 text-white border-green-500 shadow-md"
-                            : "bg-green-500/10 text-green-400 border-green-500/30 hover:bg-green-500 hover:text-white"
-                        }`}
-                      >
-                        <CheckCircle size={14} /> Confirm Payment
-                      </button>
-
-                      <button
-                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.REVIEW)}
-                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
-                          selectedParticipant.status === ut.REVIEW
-                            ? "bg-amber-500 text-black border-amber-500 shadow-md"
-                            : "bg-amber-500/10 text-amber-400 border-amber-500/30 hover:bg-amber-500 hover:text-black"
-                        }`}
-                      >
-                        <Clock size={14} /> Under Review
-                      </button>
-
-                      <button
-                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.REJECTED)}
-                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
-                          selectedParticipant.status === ut.REJECTED
-                            ? "bg-red-500 text-white border-red-500 shadow-md"
-                            : "bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500 hover:text-white"
-                        }`}
-                      >
-                        <X size={14} /> Reject
-                      </button>
-
-                      <button
-                        onClick={() => onUpdateStatus(selectedParticipant.id, ut.PRESENT)}
-                        className={`py-3 px-3 rounded-lg text-[10px] font-black uppercase tracking-wider border transition-all flex items-center justify-center gap-1.5 ${
-                          selectedParticipant.status === ut.PRESENT
-                            ? "bg-blue-500 text-white border-blue-500 shadow-md"
-                            : "bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500 hover:text-white"
-                        }`}
-                      >
-                        <ShieldCheck size={14} /> Check-In
-                      </button>
+                  {selectedParticipant.teamMembers && selectedParticipant.teamMembers.length > 0 && (
+                    <div className="border-t border-white/[0.06] pt-4">
+                      <span className="text-[10px] text-gray-500 font-cad uppercase tracking-[0.2em] block mb-3">TEAM MEMBERS ROSTER</span>
+                      <div className="space-y-2 font-cad text-xs">
+                        {selectedParticipant.teamMembers.map((m, idx) => (
+                          <div key={idx} className="flex items-center gap-2 bg-black/60 p-2.5 rounded-lg border border-white/[0.06]">
+                            <span className="text-[#C8922A] text-[10px] font-bold">#{idx + 2}</span>
+                            <span className="text-gray-200 font-bold">{m}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
+
             </div>
           </div>
         </div>
