@@ -217,3 +217,8 @@ create policy "Allow public read access to registrations" on registrations for s
 create policy "Allow public write access to registrations" on registrations for insert with check (true);
 create policy "Allow public update access to registrations" on registrations for update using (true);
 create policy "Allow public delete access to registrations" on registrations for delete using (true);
+
+-- 7. Migration Helper Query: Update Existing Registrations Table to make transactionId UNIQUE
+-- Run this in your Supabase SQL Editor if your registrations table was created earlier:
+alter table registrations add constraint registrations_transactionid_unique unique ("transactionId");
+
