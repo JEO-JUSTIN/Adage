@@ -393,3 +393,8 @@ body {
     font-size: 0.625rem;
   }
 }
+
+/* Suppress native broken image icon placeholders during loading */
+img:not([src]), img[src=""] {
+  opacity: 0;
+}
