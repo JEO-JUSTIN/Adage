@@ -38,6 +38,7 @@ create table registrations (
   events jsonb default '[]'::jsonb,
   "totalFee" integer default 0,
   "transactionId" text unique,
+  "screenshotUrl" text,
   status text not null default 'Payment Pending Verification',
   timestamp timestamptz default now()
 );
@@ -218,7 +219,7 @@ create policy "Allow public write access to registrations" on registrations for 
 create policy "Allow public update access to registrations" on registrations for update using (true);
 create policy "Allow public delete access to registrations" on registrations for delete using (true);
 
--- 7. Migration Helper Query: Update Existing Registrations Table to make transactionId UNIQUE
--- Run this in your Supabase SQL Editor if your registrations table was created earlier:
+-- 7. Migration Helper Queries: Run these in your Supabase SQL Editor if your registrations table was created earlier:
 alter table registrations add constraint registrations_transactionid_unique unique ("transactionId");
+alter table registrations add column if not exists "screenshotUrl" text;
 

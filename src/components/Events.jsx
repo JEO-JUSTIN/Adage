@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { X, Phone, ArrowRight, Loader, Zap } from 'lucide-react';
+import { X, Phone, ArrowRight, Loader, Zap, FileText, Download } from 'lucide-react';
 import { Sr, Pt } from '../events';
 import { supabase } from '../supabase';
 
@@ -156,15 +156,29 @@ export default function Events() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Title */}
-        <div className="mb-10 sm:mb-16 animate-fade-in-up">
-          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
-            <span className="w-6 sm:w-8 h-px bg-[#C8922A]" />
-            <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.4em] sm:tracking-[0.5em] text-[#C8922A] font-bold">Symposium Events</span>
+        {/* Title & Rule Book Header */}
+        <div className="mb-10 sm:mb-16 animate-fade-in-up flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+              <span className="w-6 sm:w-8 h-px bg-[#C8922A]" />
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-[0.4em] sm:tracking-[0.5em] text-[#C8922A] font-bold">Symposium Events</span>
+            </div>
+            <h1 className="font-cinzel font-black text-3xl sm:text-4xl md:text-5xl text-[#EDEBE6] uppercase tracking-wide">
+              ADAGE'26 Events
+            </h1>
           </div>
-          <h1 className="font-cinzel font-black text-3xl sm:text-4xl md:text-5xl text-[#EDEBE6] uppercase tracking-wide">
-            ADAGE'26 Events
-          </h1>
+
+          {/* Rule Book PDF Link */}
+          <a
+            href="./ADAGE 26 Rule Book .pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#090909] border border-[#C8922A]/60 hover:border-[#C8922A] text-[#C8922A] hover:text-[#EDEBE6] font-cad text-xs tracking-wider uppercase transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(200,146,42,0.25)] rounded-sm group self-start sm:self-auto"
+          >
+            <FileText size={15} className="group-hover:scale-110 transition-transform" />
+            <span>Rule Book (PDF)</span>
+            <Download size={13} className="opacity-70 group-hover:opacity-100" />
+          </a>
         </div>
 
         {/* Filter tabs — horizontal scroll on mobile */}
@@ -192,7 +206,8 @@ export default function Events() {
             {filtered.map((event, i) => (
               <div
                 key={event.id}
-                className="bg-[#0A0D14] hover:bg-[#0E121A] transition-all duration-300 group flex flex-col border-2 border-white/5 hover:border-[#C8922A]/30 animate-fade-in-up relative p-1"
+                onClick={() => setSelected(event)}
+                className="bg-[#0A0D14] hover:bg-[#0E121A] transition-all duration-300 group flex flex-col border-2 border-white/5 hover:border-[#C8922A]/30 animate-fade-in-up relative p-1 cursor-pointer"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 {/* Engineering corner blueprint tick marks */}
@@ -258,6 +273,7 @@ export default function Events() {
                       </button>
                       <Link
                         to={`/register?eventId=${event.id}`}
+                        onClick={(e) => e.stopPropagation()}
                         className="btn-primary px-2 py-2 text-[8px] tracking-widest justify-center font-mono font-bold"
                       >
                         REGISTER

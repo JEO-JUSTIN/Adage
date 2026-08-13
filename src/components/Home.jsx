@@ -5,6 +5,7 @@ import { lp } from '../events';
 import ThreeDText from './ThreeDText';
 import AdageLogo from './AdageLogo';
 import NavWireframeLogo from './NavWireframeLogo';
+import ArchitectsFooter from './ArchitectsFooter';
 
 // ─── Countdown Timer Component ──────────────────────────────────────────
 export function CountdownTimer({ targetDate, outlineOnly = false, hideText = false }) {
@@ -550,15 +551,8 @@ export default function Home() {
 
       <BeamJointDivider type="beams" />
 
-      {/* ── Footer strip ─────────────────────────────────── */}
-      <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-3 relative z-10 select-none">
-        <p className="text-[9px] sm:text-[10px] text-[#C8922A]/80 uppercase tracking-[0.2em] sm:tracking-[0.3em] font-semibold text-center sm:text-left">
-          ADAGE'26 · GCE Erode · Department of Civil Engineering
-        </p>
-        <p className="text-[9px] sm:text-[10px] text-gray-500 uppercase tracking-[0.2em] sm:tracking-[0.25em] font-medium">
-          Created by Suganth Laxman
-        </p>
-      </div>
+      {/* ── Architects of the Digital Stage & Footer ─────── */}
+      <ArchitectsFooter />
     </div>
   );
 }

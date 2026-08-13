@@ -5,7 +5,8 @@ import { ut, Sr } from '../events';
 import {
   Users, CheckCircle, Clock, AlertTriangle, Search, LogOut,
   QrCode, ClipboardList, Settings, Download, Plus, X, Phone,
-  Mail, Calendar, ArrowRight, ShieldCheck, Loader, RefreshCw, Edit, Save, Trash2
+  Mail, Calendar, ArrowRight, ShieldCheck, Loader, RefreshCw, Edit, Save, Trash2,
+  ExternalLink, FileText, Image
 } from 'lucide-react';
 
 // Manual Entry Modal
@@ -663,7 +664,7 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
   const handleExportCSV = () => {
     setIsExporting(true);
     try {
-      const headers = ["ID", "Name", "College", "Department", "Email", "Phone", "Events", "Total Fee", "Transaction ID", "Status", "Timestamp"].join(",");
+      const headers = ["ID", "Name", "College", "Department", "Email", "Phone", "Events", "Total Fee", "Transaction ID", "Screenshot Drive Link", "Status", "Timestamp"].join(",");
       const rows = registrations.map(r => [
         r.id,
         `"${r.name}"`,
@@ -674,6 +675,7 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
         `"${r.events.join(", ")}"`,
         r.totalFee,
         r.transactionId || "N/A",
+        `"${r.screenshotUrl || "N/A"}"`,
         r.status,
         r.timestamp
       ].join(","));
@@ -845,6 +847,14 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                             <p className="text-[10px] text-gray-400 uppercase tracking-wider font-mono">{participant.id}</p>
                             <div className="w-1 h-1 bg-white/20 rounded-full" />
                             <p className="text-[9px] text-gray-400 font-bold uppercase truncate max-w-[150px]">{participant.college}</p>
+                            {participant.screenshotUrl && (
+                              <>
+                                <div className="w-1 h-1 bg-white/20 rounded-full" />
+                                <span className="text-[9px] text-emerald-400 font-bold uppercase flex items-center gap-1 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                  <Image size={10} /> Screenshot
+                                </span>
+                              </>
+                            )}
                           </div>
                         </td>
                         <td className="px-10 py-8">
@@ -1259,6 +1269,34 @@ export default function AdminHub({ registrations, onUpdateStatus, onRefresh, fet
                       <span className="text-gray-400">Submitted On:</span>
                       <span className="text-gray-400 text-[11px]">{new Date(selectedParticipant.timestamp).toLocaleString()}</span>
                     </div>
+                  </div>
+
+                  {/* Google Drive UPI Screenshot Display */}
+                  <div className="border-t border-white/[0.06] pt-4 space-y-3 font-cad">
+                    <span className="text-[10px] text-gray-500 uppercase tracking-[0.2em] block">
+                      UPI PAYMENT SCREENSHOT (GOOGLE DRIVE)
+                    </span>
+                    {selectedParticipant.screenshotUrl ? (
+                      <div className="bg-black/60 border border-[#C8922A]/30 p-3 rounded-xl space-y-3">
+                        {(selectedParticipant.screenshotUrl.startsWith("data:image") || selectedParticipant.screenshotUrl.includes("supabase.co") || selectedParticipant.screenshotUrl.includes("googleusercontent.com")) && (
+                          <div className="w-full h-36 bg-black rounded-lg overflow-hidden border border-white/10 flex items-center justify-center">
+                            <img src={selectedParticipant.screenshotUrl} alt="UPI Payment Receipt" className="max-h-full max-w-full object-contain" />
+                          </div>
+                        )}
+                        <a
+                          href={selectedParticipant.screenshotUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="w-full py-2.5 px-4 bg-[#C8922A] text-black hover:bg-[#B07A20] font-cad font-bold text-xs rounded-lg uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-md"
+                        >
+                          <ExternalLink size={14} /> Open Screenshot in Google Drive
+                        </a>
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-gray-500 font-cad italic bg-black/40 p-2.5 rounded border border-white/5 text-center">
+                        No payment screenshot uploaded.
+                      </p>
+                    )}
                   </div>
                 </div>
 

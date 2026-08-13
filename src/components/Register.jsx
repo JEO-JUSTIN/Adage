@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import html2canvas from 'html2canvas';
-import { Check, Info, Users, Smartphone, ShieldCheck, Download, Award, ArrowLeft, ArrowRight, Loader, Cpu, Sparkles, Layers, CreditCard, ChevronRight, QrCode } from 'lucide-react';
+import html2canvas from 'html2canvas-pro';
+import { Check, Info, Users, Smartphone, ShieldCheck, Download, Award, ArrowLeft, ArrowRight, Loader, Cpu, Sparkles, Layers, CreditCard, ChevronRight, QrCode, Upload, Image, FileCheck, ExternalLink, X } from 'lucide-react';
 import { supabase } from '../supabase';
 import { Sr, Pt, ut } from '../events';
+import { uploadScreenshotToGoogleDrive } from '../utils/googleDrive';
 
 export default function Register() {
   const [dbEvents, setDbEvents] = React.useState([]);
@@ -35,6 +36,37 @@ export default function Register() {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState(null);
   const [createdRecord, setCreatedRecord] = useState(null);
+  const [qrBlobUrl, setQrBlobUrl] = useState("");
+
+  useEffect(() => {
+    let activeUrl = "";
+    if (createdRecord) {
+      const data = JSON.stringify({ id: createdRecord.id, type: "ADAGE_ENTRY" });
+      const api = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&bgcolor=000&color=C8922A&data=${encodeURIComponent(data)}`;
+      
+      fetch(api)
+        .then(r => r.blob())
+        .then(b => {
+          activeUrl = URL.createObjectURL(b);
+          setQrBlobUrl(activeUrl);
+        })
+        .catch(err => console.error("Error generating QR blob:", err));
+    }
+    
+    return () => {
+      if (activeUrl) {
+        URL.revokeObjectURL(activeUrl);
+      }
+    };
+  }, [createdRecord]);
+
+  const [screenshotFile, setScreenshotFile] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState(null);
+  const [screenshotUrl, setScreenshotUrl] = useState("");
+  const [isUploadingScreenshot, setIsUploadingScreenshot] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+
+  const fileInputRef = useRef(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -52,6 +84,34 @@ export default function Register() {
     phone: "",
     transactionId: ""
   });
+
+  const handleFileSelect = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setUploadError("Please select a valid image file (PNG, JPG, JPEG, WEBP).");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError("Image file size must be less than 10MB.");
+      return;
+    }
+    setUploadError("");
+    setScreenshotFile(file);
+
+    const objectUrl = URL.createObjectURL(file);
+    setScreenshotPreview(objectUrl);
+
+    setIsUploadingScreenshot(true);
+    try {
+      const gDriveUrl = await uploadScreenshotToGoogleDrive(file, form.transactionId || form.phone || "REG");
+      setScreenshotUrl(gDriveUrl);
+    } catch (err) {
+      console.error("Failed to upload screenshot to Drive:", err);
+      setUploadError(err.message || "Failed to upload screenshot to Google Drive.");
+    } finally {
+      setIsUploadingScreenshot(false);
+    }
+  };
 
   const upiId = "midhun73272@oksbi";
   const techBaseFee = 250;
@@ -174,7 +234,7 @@ export default function Register() {
       !form.name || !form.college || !form.department || !form.email || !form.phone ||
       validationErrors.email || validationErrors.phone
     )) return;
-    if (step === 3 && (!form.transactionId || form.transactionId.length !== 12)) return;
+    if (step === 3 && (!form.transactionId || form.transactionId.length !== 12 || (!screenshotFile && !screenshotUrl))) return;
     setStep(step + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -188,7 +248,7 @@ export default function Register() {
   // Submit to Database
   const handleRegistrationSubmit = async (e) => {
     e.preventDefault();
-    if (!form.transactionId || form.transactionId.length !== 12) return;
+    if (!form.transactionId || form.transactionId.length !== 12 || (!screenshotFile && !screenshotUrl)) return;
 
     setIsSubmitting(true);
     setError(null);
@@ -206,6 +266,17 @@ export default function Register() {
       }
 
       const generatedId = "ADG" + Math.random().toString(36).substring(2, 8).toUpperCase();
+      
+      let finalScreenshotUrl = screenshotUrl;
+      if (screenshotFile && !finalScreenshotUrl) {
+        try {
+          finalScreenshotUrl = await uploadScreenshotToGoogleDrive(screenshotFile, generatedId);
+          setScreenshotUrl(finalScreenshotUrl);
+        } catch (upErr) {
+          console.warn("Drive upload prior to submit warning:", upErr);
+        }
+      }
+
       const payload = {
         id: generatedId,
         name: form.name,
@@ -220,6 +291,7 @@ export default function Register() {
         }),
         totalFee: totalPayableFee,
         transactionId: form.transactionId,
+        screenshotUrl: finalScreenshotUrl || null,
         status: ut.PENDING,
         timestamp: new Date().toISOString()
       };
@@ -267,9 +339,7 @@ export default function Register() {
     }
   };
 
-  const passQrCodeUrl = createdRecord
-    ? `https://api.qrserver.com/v1/create-qr-code/?size=300x300&bgcolor=000&color=C8922A&data=${encodeURIComponent(JSON.stringify({ id: createdRecord.id, type: "ADAGE_ENTRY" }))}`
-    : "";
+  // passQrCodeUrl is replaced by qrBlobUrl state
 
   const isUtrValid = form.transactionId.length === 12;
 
@@ -745,6 +815,108 @@ export default function Register() {
                       </p>
                     )}
                   </div>
+
+                  {/* UPI Screenshot Upload Box */}
+                  <div className="space-y-3 pt-2">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-cad font-bold text-[#C8922A] uppercase tracking-widest block">
+                        UPI Payment Screenshot (Required) *
+                      </label>
+                      {screenshotUrl ? (
+                        <span className="text-[9px] font-cad text-emerald-400 flex items-center gap-1 font-bold">
+                          <Check size={12} /> Receipt Uploaded
+                        </span>
+                      ) : (
+                        <span className="text-[9px] font-cad text-amber-400 font-bold uppercase">
+                          Upload Required
+                        </span>
+                      )}
+                    </div>
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          handleFileSelect(e.target.files[0]);
+                        }
+                      }}
+                    />
+
+                    {!screenshotPreview ? (
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            handleFileSelect(e.dataTransfer.files[0]);
+                          }
+                        }}
+                        className="border-2 border-dashed border-amber-500/40 hover:border-[#C8922A] bg-black/40 hover:bg-black/60 p-6 rounded-xl text-center cursor-pointer transition-all duration-300 group"
+                      >
+                        <div className="w-12 h-12 bg-[#C8922A]/10 border border-[#C8922A]/30 rounded-xl flex items-center justify-center mx-auto mb-3 text-[#C8922A] group-hover:scale-110 transition-transform">
+                          <Upload size={22} />
+                        </div>
+                        <p className="text-xs font-cad font-bold text-[#EDEBE6] uppercase tracking-wider mb-1">
+                          Upload Payment Receipt / Screenshot *
+                        </p>
+                        <p className="text-[10px] font-cad text-gray-400">
+                          Drag & drop image here or click to browse (PNG, JPG, WEBP)
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="bg-black/60 border border-[#C8922A]/40 p-4 rounded-xl space-y-3 relative group">
+                        <div className="flex items-center gap-4">
+                          <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/10 flex-shrink-0 bg-black">
+                            <img src={screenshotPreview} alt="UPI Payment Screenshot" className="w-full h-full object-cover" />
+                          </div>
+                          <div className="flex-1 min-w-0 font-cad">
+                            <p className="text-xs font-bold text-white truncate">{screenshotFile?.name || "Payment_Screenshot.png"}</p>
+                            <p className="text-[10px] text-gray-400 font-mono">
+                              {(screenshotFile?.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                            
+                            {isUploadingScreenshot ? (
+                              <div className="flex items-center gap-1.5 text-[10px] text-[#C8922A] mt-1 font-bold">
+                                <Loader size={12} className="animate-spin" /> Processing screenshot...
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2 mt-1">
+                                <span className="text-[9px] font-black uppercase text-emerald-400 bg-emerald-500/10 px-2 py-0.5 border border-emerald-500/30 rounded flex items-center gap-1">
+                                  <FileCheck size={10} /> Payment Receipt Uploaded
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() => {
+                              setScreenshotFile(null);
+                              setScreenshotPreview(null);
+                              setScreenshotUrl("");
+                              setUploadError("");
+                            }}
+                            className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Remove file"
+                          >
+                            <X size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {uploadError && (
+                      <p className="text-[10px] text-amber-400 font-cad font-bold">{uploadError}</p>
+                    )}
+                    {!screenshotPreview && (
+                      <p className="text-[10px] text-amber-400 font-cad font-bold flex items-center justify-center gap-1 pt-1">
+                        * You must upload your UPI payment receipt screenshot to proceed
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -757,7 +929,7 @@ export default function Register() {
                 </button>
                 <button
                   onClick={handleNextStep}
-                  disabled={!isUtrValid}
+                  disabled={!isUtrValid || (!screenshotFile && !screenshotUrl) || isUploadingScreenshot}
                   className="sm:flex-[2] btn-primary justify-center py-4 text-xs tracking-[0.2em] disabled:opacity-40"
                 >
                   REVIEW & VERIFY DETAILS <ArrowRight size={16} />
@@ -872,6 +1044,19 @@ export default function Register() {
                       <span className="text-gray-500 text-[10px] block uppercase">TOTAL AMOUNT PAYABLE</span>
                       <strong className="text-[#EDEBE6] text-sm font-bold">₹{totalPayableFee}</strong>
                     </div>
+                    {screenshotPreview && (
+                      <div className="sm:col-span-2 pt-3 border-t border-white/[0.06] flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <img src={screenshotPreview} alt="Payment Receipt" className="w-10 h-10 object-cover rounded border border-white/20" />
+                          <div>
+                            <span className="text-gray-400 text-[10px] block uppercase">UPI RECEIPT SCREENSHOT</span>
+                            <span className="text-emerald-400 text-xs font-bold flex items-center gap-1">
+                              <Check size={12} /> Payment Receipt Attached
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -978,7 +1163,13 @@ export default function Register() {
 
                   {/* QR Code */}
                   <div className="bg-white p-3 inline-block border border-[#C8922A] mb-5 relative z-10 w-full text-center">
-                    <img src={passQrCodeUrl} alt="Pass QR Code" className="w-40 h-40 mx-auto" crossOrigin="anonymous" />
+                    {qrBlobUrl ? (
+                      <img src={qrBlobUrl} alt="Pass QR Code" className="w-40 h-40 mx-auto" />
+                    ) : (
+                      <div className="w-40 h-40 flex items-center justify-center mx-auto">
+                        <Loader className="animate-spin text-[#C8922A]" size={24} />
+                      </div>
+                    )}
                     <span className="text-[9px] font-cad font-bold text-black block mt-1 tracking-widest">
                       ID: {createdRecord.id}
                     </span>
