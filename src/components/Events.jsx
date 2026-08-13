@@ -4,6 +4,8 @@ import { X, Phone, ArrowRight, Loader, Zap, FileText, Download } from 'lucide-re
 import { Sr, Pt } from '../events';
 import { supabase } from '../supabase';
 
+const DEFAULT_FALLBACK = 'https://images.unsplash.com/photo-1503387762-592dedb8c260?auto=format&fit=crop&q=80&w=800';
+
 function EventModal({ event, onClose }) {
   if (!event) return null;
   return (
@@ -23,8 +25,13 @@ function EventModal({ event, onClose }) {
         </div>
 
         {/* Modal header */}
-        <div className="relative h-32 sm:h-40 flex-shrink-0 overflow-hidden">
-          <img src={event.image} alt="" className="w-full h-full object-cover opacity-20" />
+        <div className="relative h-32 sm:h-40 flex-shrink-0 overflow-hidden bg-[#0A0D14]">
+          <img
+            src={event.image || DEFAULT_FALLBACK}
+            alt={event.title || 'Event'}
+            onError={e => { e.target.onerror = null; e.target.src = DEFAULT_FALLBACK; }}
+            className="w-full h-full object-cover opacity-25"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/60 to-transparent" />
           <div className="absolute bottom-4 sm:bottom-5 left-4 sm:left-6 right-12">
             <span className="text-[#C8922A] text-[8px] sm:text-[9px] font-bold uppercase tracking-[0.4em]">{event.category}</span>
@@ -129,7 +136,6 @@ export default function Events() {
   const [filter, setFilter]           = useState('All');
   const [isLoading, setIsLoading]     = useState(true);
   const [selectedEvent, setSelected]  = useState(null);
-  const fallback = 'https://images.unsplash.com/photo-1503387762-592dedb8c260?auto=format&fit=crop&q=80&w=800';
 
   useEffect(() => {
     (async () => {
@@ -222,11 +228,12 @@ export default function Events() {
                   <div className="blueprint-draft-lines opacity-10 pointer-events-none" />
 
                   {/* Blueprint visual box */}
-                  <div className="relative h-36 sm:h-40 overflow-hidden mb-4 border border-white/[0.05]">
+                  <div className="relative h-36 sm:h-40 overflow-hidden mb-4 border border-white/[0.05] bg-[#0A0D14]">
                     <img
-                      src={event.image || fallback}
+                      src={event.image || DEFAULT_FALLBACK}
                       alt={event.title}
-                      onError={e => e.target.src = fallback}
+                      loading="lazy"
+                      onError={e => { e.target.onerror = null; e.target.src = DEFAULT_FALLBACK; }}
                       className="w-full h-full object-cover opacity-45 group-hover:opacity-60 transition-opacity duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0A0D14] via-transparent to-transparent" />
